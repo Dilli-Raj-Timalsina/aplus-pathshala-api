@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mongoose": "^7.0.1",
+    "nodemon": "^2.0.21"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "name": "user-authorization--authentication",
+  "version": "1.0.0",
+  "description": "This is testing version 1 for user authentication ",
+  "main": "server.js",
+  "author": "Dilli Raj Timalsina",
+  "license": "ISC"
+}
