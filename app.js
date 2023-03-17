@@ -1,18 +1,12 @@
 const express = require("express");
 const app = express();
-
 const userRouter = express.Router();
+const postUser = require("./Controller/userController");
 
-userRouter
-  .route("/user")
-  .get((req, res) => {
-    console.log("get request done");
-    res.end();
-  })
-  .put((req, res) => {
-    res.end("Responce from put request");
-  });
+//It is used to make req.body available ,it is middleware so it should be added in middleware stack
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use("/api/v1/user", userRouter);
 
-//adding it into out middleware stack:
-app.use("/api/v1/", userRouter);
+userRouter.route("/").post(postUser);
 module.exports = app;
