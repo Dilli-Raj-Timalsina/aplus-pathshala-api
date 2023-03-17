@@ -1,15 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { Collection } from "mongoose";
 const { Schema } = mongoose;
-
-const blogSchema = new Schema({
-  title: String, // String is shorthand for {type: String}
-  author: String,
-  body: String,
-  comments: [{ body: String, date: Date }],
-  date: { type: Date, default: Date.now },
-  hidden: Boolean,
-  meta: {
-    votes: Number,
-    favs: Number,
-  },
+const userScheme = new Schema({
+  name: String,
+  contact: Number,
 });
+const Table_Collection = mongoose.model("Table_collection", userScheme);
+const Row_document = new Table_Collection({
+  name: "Dilli Raj Timalsina",
+  contact: 984525211,
+});
+
+module.exports = blogSchema;

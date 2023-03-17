@@ -11,5 +11,9 @@
   "description": "This is testing version 1 for user authentication ",
   "main": "server.js",
   "author": "Dilli Raj Timalsina",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.18.2",
+    "ndb": "^1.1.5"
+  }
 }
