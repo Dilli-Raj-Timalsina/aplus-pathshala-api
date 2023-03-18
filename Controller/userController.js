@@ -1,12 +1,39 @@
 const Student = require("./../userSchema");
 
-module.exports = async function postUser(req, res) {
+async function postUser(req, res) {
   try {
+    // console.log(doc.);
     const stu = await Student.create(req.body);
-    await stu.save();
-    res.end("get request done");
+
+    res.status(200).send({
+      result: {
+        status: "sucess",
+        data: {
+          stu,
+        },
+      },
+    });
   } catch (err) {
     console.log(err);
     res.end("error occured!");
   }
-};
+}
+
+async function getUser(req, res) {
+  try {
+    const data = await Student.findById("641565d60632af92ef0619").exec();
+    res.status(200).send({
+      result: {
+        status: "sucess",
+        data: {
+          data,
+        },
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.end("Error occured");
+  }
+}
+
+module.exports = { postUser, getUser };
