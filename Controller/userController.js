@@ -21,7 +21,7 @@ async function postUser(req, res) {
 
 async function getUser(req, res) {
   try {
-    const data = await Student.findById("641565d60632af92ef0619").exec();
+    const data = await Student.findById("641565d60632af8192ef0619").exec();
     res.status(200).send({
       result: {
         status: "sucess",
