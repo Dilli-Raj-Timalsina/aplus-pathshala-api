@@ -1,18 +1,13 @@
 const Student = require("./../userSchema");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const crypto = require("crypto");
+const cookieParser = require("cookie-parser");
 
-async function postUser(req, res) {
+async function loginUser(req, res) {
   try {
-    // console.log(doc.);
-    const stu = await Student.create(req.body);
-
-    res.status(200).send({
-      result: {
-        status: "sucess",
-        data: {
-          stu,
-        },
-      },
-    });
+    console.log(req);
+    res.end("ok");
   } catch (err) {
     console.log(err);
     res.end("error occured!");
@@ -36,4 +31,4 @@ async function getUser(req, res) {
   }
 }
 
-module.exports = { postUser, getUser };
+module.exports = { loginUser, getUser };
