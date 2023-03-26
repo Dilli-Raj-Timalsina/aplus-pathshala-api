@@ -29,4 +29,21 @@ async function signupControl(req, res) {
   }
 }
 
-module.exports = { loginControl, signupControl };
+async function getResouce(req, res) {
+  try {
+    const data = await Student.findById("641565d60632af8192ef0619").exec();
+    res.status(200).send({
+      result: {
+        status: "sucess",
+        data: {
+          data,
+        },
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.end("Error occured");
+  }
+}
+
+module.exports = { loginControl, signupControl, getResouce };
