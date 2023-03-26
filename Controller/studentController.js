@@ -1,16 +1,11 @@
 const Student = require("../StudentSchema/studentSchema");
-
+const asyncCatch = require("../ErrorHandeling/catchAsync");
 const cookieParser = require("cookie-parser");
 
-async function loginControl(req, res) {
-  try {
-    console.log(req);
-    res.end("ok");
-  } catch (err) {
-    console.log(err);
-    res.end("error occured!");
-  }
-}
+const loginControl = asyncCatch(async (req, res) => {
+  console.log(req);
+  res.end("ok");
+});
 
 async function signupControl(req, res) {
   try {
