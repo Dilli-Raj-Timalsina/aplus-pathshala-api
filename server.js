@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const app = require("./app");
-const AppError = require("./ErrorHandeling/appError");
 
+//setting dotenv file in our server
+require("dotenv").config({ path: __dirname + "/.env" });
 //MongoDB local Database Connection:
 try {
   mongoose.connect("mongodb://127.0.0.1:27017/User");
@@ -16,6 +17,6 @@ and creates app{} object from express() method and starts server by listening
 to the port 3000/PORT , by below code .
 */
 
-app.listen(3000, () => {
-  console.log("App is running on port 3000");
+app.listen(process.env["PORT"], () => {
+  console.log(`App is running on port ${process.env.PORT}`);
 });

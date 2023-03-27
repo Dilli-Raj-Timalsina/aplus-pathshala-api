@@ -8,21 +8,26 @@ const express = require("express");
 middleware stack .
 */
 const app = express();
-//installing passport and passport-jwt startegy and including them into our
-//middleware stack.
-const studentRouter = express.Router();
-//adding mini-application i.e studentRouter on middleware stack
-app.use("/api/v1/student", studentRouter);
 /*It is used to make req.body available ,
 it is middleware so it should be added in middleware stack
 */
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
+const studentRouter = express.Router();
+//adding mini-application i.e studentRouter on middleware stack
+app.use("/api/v1/student", studentRouter);
 
-//studentRouter route distributing:
+//Including studentController methods in out application:
+const {
+  signupControl,
+  dashBoard,
+  loginControl,
+} = require("./Controller/studentController");
+
+// studentRouter route distributing:
 studentRouter.route("/signup").post(signupControl);
 studentRouter.route("/login").post(loginControl);
-studentRouter.route("/resource").get(getResouce);
+studentRouter.route("/resource").get(dashBoard);
 
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {
