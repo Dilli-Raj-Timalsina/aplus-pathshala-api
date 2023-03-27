@@ -1,44 +1,8 @@
 const Student = require("../StudentSchema/studentSchema");
-const asyncCatch = require("../ErrorHandeling/catchAsync");
-const cookieParser = require("cookie-parser");
+const catchAsync = require("../ErrorHandeling/catchAsync");
 
-const loginControl = asyncCatch(async (req, res) => {
-  console.log(req);
-  res.end("ok");
-});
+const loginControl = catchAsync(async (req, res) => {});
+const signupControl = catchAsync(async (req, res) => {});
+const dashBoard = catchAsync(async (req, res) => {});
 
-async function signupControl(req, res) {
-  try {
-    const data = await Student.findById("641565d60632af8192ef0619").exec();
-    res.status(200).send({
-      result: {
-        status: "sucess",
-        data: {
-          data,
-        },
-      },
-    });
-  } catch (err) {
-    console.log(err);
-    res.end("Error occured");
-  }
-}
-
-async function getResouce(req, res) {
-  try {
-    const data = await Student.findById("641565d60632af8192ef0619").exec();
-    res.status(200).send({
-      result: {
-        status: "sucess",
-        data: {
-          data,
-        },
-      },
-    });
-  } catch (err) {
-    console.log(err);
-    res.end("Error occured");
-  }
-}
-
-module.exports = { loginControl, signupControl, getResouce };
+module.exports = { loginControl, signupControl, dashBoard };

@@ -4,6 +4,7 @@ const studentData = new Schema({
   name: { type: String, unique: false, required: false },
   email: {
     type: String,
+    lowercase: true,
     unique: true,
     required: true,
   },
@@ -16,6 +17,10 @@ const studentData = new Schema({
     type: String,
     unique: false,
     required: false,
+  },
+  contact: {
+    require: [true, "Contact Not provided"],
+    type: Number,
   },
 });
 const Student = mongoose.model("Student", studentData);
