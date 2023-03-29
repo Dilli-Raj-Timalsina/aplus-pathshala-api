@@ -20,14 +20,22 @@ app.use("/api/v1/student", studentRouter);
 //Including studentController methods in out application:
 const {
   signupControl,
-  dashBoard,
+  dashBoardControl,
   loginControl,
 } = require("./Controller/studentController");
+const passport = require("passport");
+
+//passport config:
+const initialize = require("./Controller/passportInit");
+initialize(passport);
+app.use(passport.initialize());
 
 // studentRouter route distributing:
 studentRouter.route("/signup").post(signupControl);
 studentRouter.route("/login").post(loginControl);
-studentRouter.route("/resource").get(dashBoard);
+studentRouter
+  .route("/resource")
+  .get(passport.authenticate("jwt", { session: false }), dashBoardControl);
 
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {
