@@ -3,6 +3,7 @@ const app = require("./app");
 
 //setting dotenv file in our server
 require("dotenv").config({ path: __dirname + "/.env" });
+
 //MongoDB local Database Connection:
 try {
   mongoose.connect("mongodb://127.0.0.1:27017/User");

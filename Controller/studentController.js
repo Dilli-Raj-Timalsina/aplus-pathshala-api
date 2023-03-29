@@ -24,7 +24,10 @@ const loginControl = catchAsync(async (req, res) => {
   //if match==true,then verify token
   if (match) {
     //verify token:
-    const result = await jwt.verify(req.body.token, process.env.SECRET);
+    const result = await jwt.verify(
+      req.headers.authorization.split(" ")[1],
+      process.env.SECRET
+    );
     if (result) {
       res.status(400).json({
         status: "sucess",
@@ -45,10 +48,8 @@ const signupControl = catchAsync(async (req, res) => {
   user.save().then((savedDoc) => {
     res.status(200).json({
       status: "sucess",
-      token: token,
-      data: {
-        savedDoc,
-      },
+      token: "Bearer" + token,
+      savedDoc,
     });
   });
 });

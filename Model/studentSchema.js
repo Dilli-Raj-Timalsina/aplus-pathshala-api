@@ -4,7 +4,7 @@ const studentData = new Schema({
   name: {
     type: String,
     unique: false,
-    required: [true, "Student Name not provided "],
+    required: false,
   },
   email: {
     type: String,
@@ -23,7 +23,7 @@ const studentData = new Schema({
     required: true,
   },
   contact: {
-    require: [true, "Contact Not provided"],
+    require: false,
     type: Number,
   },
 });
