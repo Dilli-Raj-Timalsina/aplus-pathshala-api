@@ -23,8 +23,13 @@ const studentData = new Schema({
     required: true,
   },
   contact: {
-    require: false,
+    required: false,
     type: Number,
+  },
+  google_id: {
+    type: Number,
+    required: false,
+    default: 100,
   },
 });
 //It is convention to use Model as a Uppercase first and scheme as lowercase,
