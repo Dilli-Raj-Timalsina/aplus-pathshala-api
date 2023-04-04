@@ -11,7 +11,6 @@ try {
 } catch (err) {
   console.log(err);
 }
-
 /*Starting express Server:
 when we run "node server.js" it imports app.js i.e object of module.exports,
 and creates app{} object from express() method and starts server by listening
