@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const passport = require("passport");
-const { signToken } = require("./../AuthConfig/basic-jwt");
+const { signToken } = require("../controllers/authController");
 
 router.get(
   "/auth/google",

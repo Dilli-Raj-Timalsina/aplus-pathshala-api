@@ -1,37 +1,22 @@
 const express = require("express");
 const app = express();
-const morgan = require("morgan");
 const passport = require("passport");
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-require("./AuthConfig/passport-jwt");
-require("./AuthConfig/passport-google");
+//basic passport configuration:
+require("./authConfig/passport-jwt");
+require("./authConfig/passport-google");
 app.use(passport.initialize());
-const googleauthRouter = require("./AuthController/authRoute");
+
+//Routes:
+const googleauthRouter = require("./routes/googleAuthRoute");
+const studentRouter = require("./routes/authRoute");
+const teacherRouter = require("./routes/teacherRoute");
 
 app.use(googleauthRouter);
-
-const studentRouter = express.Router();
 app.use("/api/v1/student", studentRouter);
-
-const { signupControl, loginControl } = require("./AuthConfig/basic-jwt");
-// studentRouter route distributing:
-studentRouter.route("/signup").post(signupControl);
-studentRouter.route("/login").post(loginControl);
-
-studentRouter
-  .route("/protected")
-  .get(passport.authenticate("jwt", { session: false }), (req, res) => {
-    res.end("authetication is successful");
-  });
-
-//testing little bit:
-app.get("/query", (req, res) => {
-  console.log(req.query);
-  console.log(req.params);
-  res.end();
-});
+app.use("/api/v1/teacher", teacherRouter);
 
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {

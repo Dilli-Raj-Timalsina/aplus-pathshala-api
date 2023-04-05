@@ -2,10 +2,10 @@
 // bcrypt module does 2 things:1) salting and hashing(hash verification as well)
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const AppError = require("./../GlobalErrorConfig/appError");
+const AppError = require("../errors/appError");
 
-const catchAsync = require("../GlobalErrorConfig/catchAsync");
-const User = require("../Model/studentSchema");
+const catchAsync = require("../errors/catchAsync");
+const User = require("../models/studentSchema");
 
 //all functionality related to basic signup and login using jwt:
 const signToken = async (id) => {
