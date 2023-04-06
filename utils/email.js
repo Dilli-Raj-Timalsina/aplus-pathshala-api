@@ -1,43 +1,27 @@
 const nodemailer = require("nodemailer");
+const catchAsync = require("../errors/catchAsync");
 
-/** send mail from real gmail account */
-const getMail = (req, res) => {
-  const gmail = req.body.gmail;
-  console.log();
-  console.log(gmail);
-
-  let config = {
+const sendMail = catchAsync(async (options) => {
+  // 1) Create a transporter
+  const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "dillirajtimalsina354@gmail.com",
-      pass: "dontulhalxcjdaap",
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
     },
-  };
-
-  let transporter = nodemailer.createTransport(config);
-
-  let message = {
+  });
+  // 2) Define the email options
+  const message = {
     from: "Dilli Raj Timalsina <dillirajtimalsina354@gmail.com>",
-    to: gmail,
-    subject: "Hello ✔",
-    text: "Successfully Register with us.",
-    html: "<b>Successfully Register with us.</b>",
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
   };
 
-  transporter
-    .sendMail(message)
-    .then(() => {
-      return res.status(201).json({
-        msg: "you should receive an email",
-      });
-    })
-    .catch((error) => {
-      return res.status(500).json({ error });
-    });
-
-  // res.status(201).json("getBill Successfully...!");
-};
+  // 3) Actually send the email
+  await transporter.sendMail(message);
+});
 
 module.exports = {
-  getMail,
+  sendMail,
 };

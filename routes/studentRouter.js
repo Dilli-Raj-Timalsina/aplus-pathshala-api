@@ -4,12 +4,10 @@ const {
   loginControl,
   resetControl,
 } = require("../controllers/studentController");
-const { getMail } = require("./../utils/email");
 
 // studentRouter route distributing:
 router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
-router.route("/getMail").post(getMail);
 
 // router
 //   .route("/protected")
