@@ -32,6 +32,8 @@ const studentData = new Schema({
     default: 100,
   },
 });
-//It is convention to use Model as a Uppercase first and scheme as lowercase,
+// studentData.pre("save", function () {
+//   console.log(this);
+// });
 const Student = mongoose.model("Student", studentData);
 module.exports = Student;

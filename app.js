@@ -10,11 +10,11 @@ require("./authConfig/passport-google");
 app.use(passport.initialize());
 
 //Routes:
-const googleauthRouter = require("./routes/googleAuthRoute");
-const studentRouter = require("./routes/authRoute");
-const teacherRouter = require("./routes/teacherRoute");
+const googleAuthRouter = require("./routes/googleAuthRouter");
+const studentRouter = require("./routes/studentRouter");
+const teacherRouter = require("./routes/teacherRouter");
 
-app.use(googleauthRouter);
+app.use(googleAuthRouter);
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/teacher", teacherRouter);
 

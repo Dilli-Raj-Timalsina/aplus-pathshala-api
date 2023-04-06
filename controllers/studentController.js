@@ -40,7 +40,7 @@ const loginControl = catchAsync(async (req, res) => {
     //verify token:
     const token = await signToken(req.body);
     res.status(400).json({
-      status: "sucess",
+      status: "success",
       token: "Bearer " + token,
     });
   } else {
@@ -50,10 +50,8 @@ const loginControl = catchAsync(async (req, res) => {
 
 const signupControl = catchAsync(async (req, res) => {
   const hash = await hashPassport(req.body.passport, 10);
-  console.log(hash);
   req.body.passport = hash;
   req.body.passport_confirm = hash;
-  console.log(req.body);
   const user = new User(req.body);
   const token = await signToken(req.body);
   user.save().then((savedDoc) => {
@@ -65,4 +63,6 @@ const signupControl = catchAsync(async (req, res) => {
   });
 });
 
-module.exports = { signupControl, loginControl, signToken };
+const resetControl = catchAsync(async (req, res) => {});
+
+module.exports = { signupControl, loginControl, signToken, resetControl };
