@@ -1,2 +1,0 @@
-1:complete full flezed authentication system for teacher and student including
-1.signup,login,signup with google, change passport via phone number and email,
