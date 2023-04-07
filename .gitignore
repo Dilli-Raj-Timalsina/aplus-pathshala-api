@@ -1,4 +1,3 @@
-/node_modules/  
-.md  
-.env
-.txt
+/node_modules/   
+*.env
+*.txt
