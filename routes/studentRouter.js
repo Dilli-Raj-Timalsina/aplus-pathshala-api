@@ -3,11 +3,13 @@ const {
   signupControl,
   loginControl,
   resetControl,
-} = require("../controllers/studentController");
+  fakeControl,
+} = require("../controllers/studentAuthController");
 
 // studentRouter route distributing:
 router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
+router.route("/fake").post(fakeControl);
 
 // router
 //   .route("/protected")

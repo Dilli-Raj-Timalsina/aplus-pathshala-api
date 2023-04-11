@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const passport = require("passport");
-const { signToken } = require("../controllers/studentController");
+const { signToken } = require("../controllers/studentAuthController");
 
 router.get(
   "/auth/google",

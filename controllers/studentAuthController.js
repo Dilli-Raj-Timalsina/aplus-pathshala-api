@@ -6,6 +6,7 @@ const AppError = require("../errors/appError");
 
 const catchAsync = require("../errors/catchAsync");
 const User = require("../models/studentSchema");
+const { Schema, Mongoose } = require("mongoose");
 
 //all functionality related to basic signup and login using jwt:
 const signToken = async (id) => {
@@ -32,37 +33,47 @@ const loginControl = catchAsync(async (req, res) => {
   if (!email || !passport) {
     throw new AppError("email or passport not provided", 403);
   }
-  //verify email and passport
-  const match = await verifyPassport(email, passport);
+  // 2) Check if user exists && password is correct
+  const user = await User.findOne({ email }).select("+password");
 
-  //if match==truthy,then verify token
-  if (match) {
-    //verify token:
-    const token = await signToken(req.body);
-    res.status(400).json({
-      status: "success",
-      token: "Bearer " + token,
-    });
-  } else {
-    throw new AppError("Incorrect Passport", 400);
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError("Incorrect email or password", 401));
   }
+  //3) If everything is ok: send token to the logged in user
+  const token = await signToken(req.body);
+  res.status(400).json({
+    status: "success",
+    token: "Bearer " + token,
+  });
 });
 
 const signupControl = catchAsync(async (req, res) => {
-  const hash = await hashPassport(req.body.passport, 10);
-  req.body.passport = hash;
-  req.body.passport_confirm = hash;
-  const user = new User(req.body);
-  const token = await signToken(req.body);
-  user.save().then((savedDoc) => {
-    res.status(200).json({
-      status: "sucess",
-      token: "Bearer " + token,
-      ...savedDoc,
-    });
+  const user = await User.create({
+    ...req.body,
   });
+
+  // if everything is ok :send token to the user
+  const token = await signToken(req.body);
+  res.status(200).json({
+    status: "sucess",
+    token: "Bearer " + token,
+  });
+});
+
+const fakeControl = catchAsync(async (req, res, next) => {
+  const query = User.findById(req.body);
+  query.then((users) => {
+    console.log(users.fake());
+  });
+  res.end("fake responce ended");
 });
 
 const resetControl = catchAsync(async (req, res) => {});
 
-module.exports = { signupControl, loginControl, signToken, resetControl };
+module.exports = {
+  signupControl,
+  loginControl,
+  signToken,
+  resetControl,
+  fakeControl,
+};

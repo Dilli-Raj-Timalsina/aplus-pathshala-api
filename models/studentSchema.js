@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 const { Schema } = mongoose;
-const studentData = new Schema({
+const studentSchema = new Schema({
   name: {
     type: String,
-    unique: false,
     required: false,
   },
   email: {
@@ -11,16 +11,29 @@ const studentData = new Schema({
     lowercase: true,
     unique: true,
     required: true,
+    validate: {
+      validator: function (value) {
+        return validator.isEmail(value);
+      },
+      message: "wrong email format bro",
+    },
   },
-  passport: {
+  passpord: {
     type: String,
     unique: false,
-    required: true,
+    required: false,
   },
-  passport_confirm: {
+  passpord_confirm: {
     type: String,
     unique: false,
-    required: true,
+    required: false,
+    validate: {
+      // This only works on CREATE and SAVE!!!
+      validator: function (value) {
+        return value === this.password;
+      },
+      message: "Passwords are not the same!",
+    },
   },
   contact: {
     required: false,
@@ -32,8 +45,30 @@ const studentData = new Schema({
     default: 100,
   },
 });
-// studentData.pre("save", function () {
-//   console.log(this);
-// });
-const Student = mongoose.model("Student", studentData);
+
+//Middleware
+studentSchema.pre("save", async function (next) {
+  // Only run this function if password was actually modified
+  if (!this.isModified("password")) return next();
+  // Hash the password with cost of 12
+  this.password = await bcrypt.hash(this.password, 10);
+  // Delete passwordConfirm field
+  this.passwordConfirm = undefined;
+  next();
+});
+
+//Instance Methods starts over here:
+studentSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+studentSchema.methods.fake = async function () {
+  console.log("fake executed");
+};
+
+const Student = mongoose.model("Student", studentSchema);
+
 module.exports = Student;
