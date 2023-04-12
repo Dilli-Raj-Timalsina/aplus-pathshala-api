@@ -64,8 +64,9 @@ const forgetControl = catchAsync(async (req, res, next) => {
   await User.findOneAndUpdate({ email: email }, { "child.token": hash });
 
   //4) preparing credentials to send user an email:
-  let clientURL = "127.0.0.1:3000/api/v1/student";
-  const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`;
+  const link = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/student/passwordReset?token=${resetToken}&id=${user._id}`;
   const options = {
     email: email,
     subject: "Reset password A+ pathshala ",
