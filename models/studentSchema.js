@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
+const tokenSchema = require("./tokenSchema");
 const studentSchema = new Schema({
   name: {
     type: String,
@@ -18,12 +20,12 @@ const studentSchema = new Schema({
       message: "wrong email format bro",
     },
   },
-  passpord: {
+  password: {
     type: String,
     unique: false,
     required: false,
   },
-  passpord_confirm: {
+  passwordConfirm: {
     type: String,
     unique: false,
     required: false,
@@ -44,6 +46,10 @@ const studentSchema = new Schema({
     required: false,
     default: 100,
   },
+  child: {
+    type: tokenSchema,
+    default: () => ({}),
+  },
 });
 
 //Middleware
@@ -56,7 +62,6 @@ studentSchema.pre("save", async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
-
 //Instance Methods starts over here:
 studentSchema.methods.correctPassword = async function (
   candidatePassword,

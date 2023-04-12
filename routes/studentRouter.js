@@ -2,6 +2,7 @@ const router = require("express").Router();
 const {
   signupControl,
   loginControl,
+  forgetControl,
   resetControl,
   fakeControl,
 } = require("../controllers/studentAuthController");
@@ -9,6 +10,8 @@ const {
 // studentRouter route distributing:
 router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
+router.route("/forgetPassword").post(forgetControl);
+router.route("/resetPassword").post(resetControl);
 router.route("/fake").post(fakeControl);
 
 // router
