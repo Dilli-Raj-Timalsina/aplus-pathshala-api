@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
-const teacherData = new Schema({
+const tokenSchema = require("./tokenSchema");
+
+//Teacher Schema Defination:
+const teacherSchema = new Schema({
   name: {
     type: String,
     unique: false,
@@ -11,16 +16,29 @@ const teacherData = new Schema({
     lowercase: true,
     unique: true,
     required: true,
+    validate: {
+      validator: function (value) {
+        return validator.isEmail(value);
+      },
+      message: "wrong email format bro",
+    },
   },
-  passport: {
+  password: {
     type: String,
     unique: false,
-    required: true,
+    required: false,
   },
-  passport_confirm: {
+  passwordConfirm: {
     type: String,
     unique: false,
-    required: true,
+    required: false,
+    validate: {
+      // This only works on CREATE and SAVE!!!
+      validator: function (value) {
+        return value === this.password;
+      },
+      message: "Passwords are not the same!",
+    },
   },
   contact: {
     required: false,
@@ -31,7 +49,27 @@ const teacherData = new Schema({
     required: false,
     default: 100,
   },
+  child: {
+    type: tokenSchema,
+    default: () => ({}),
+  },
 });
-//It is convention to use Model as a Uppercase first and scheme as lowercase,
-const Teacher = mongoose.model("Teacher", teacherData);
+
+teacherSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10);
+
+  this.passwordConfirm = undefined;
+  next();
+});
+
+teacherSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+const Teacher = mongoose.model("Teacher", teacherSchema);
 module.exports = Teacher;
