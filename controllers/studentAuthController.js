@@ -106,6 +106,11 @@ const resetControl = catchAsync(async (req, res) => {
 });
 
 //just for testing purpose
+const logoutControl = catchAsync(async (req, res, next) => {
+  res.end("logged out");
+});
+
+//just for testing purpose
 const fakeControl = catchAsync(async (req, res, next) => {
   const query = User.findById(req.body);
   query.then((users) => {
@@ -120,5 +125,6 @@ module.exports = {
   signToken,
   forgetControl,
   resetControl,
+  logoutControl,
   fakeControl,
 };
