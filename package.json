@@ -2,6 +2,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "crypto": "^1.0.1",
+    "express-rate-limit": "^6.7.0",
     "jsonwebtoken": "^9.0.0",
     "mailgen": "^2.0.27",
     "mongoose": "^7.0.1",
