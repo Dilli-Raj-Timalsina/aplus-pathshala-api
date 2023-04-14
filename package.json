@@ -2,6 +2,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "crypto": "^1.0.1",
+    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.7.0",
     "helmet": "^6.1.5",
     "jsonwebtoken": "^9.0.0",
@@ -13,7 +14,8 @@
     "passport-google-oauth2": "^0.2.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
-    "validator": "^13.9.0"
+    "validator": "^13.9.0",
+    "xss-clean": "^0.1.1"
   },
   "scripts": {
     "start": "nodemon server.js"
