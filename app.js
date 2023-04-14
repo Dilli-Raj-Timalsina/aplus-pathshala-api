@@ -2,8 +2,11 @@ const express = require("express");
 const app = express();
 const passport = require("passport");
 const bodyParser = require("body-parser");
+
 app.use(bodyParser.json());
 //Global Middlewares:
+const helmet = require("helmet");
+app.use(helmet());
 
 //Rate Limiter:
 const rateLimit = require("express-rate-limit");
