@@ -1,19 +1,27 @@
 const express = require("express");
 const app = express();
-const passport = require("passport");
-const bodyParser = require("body-parser");
-const mongoSanitize = require("express-mongo-sanitize");
 
+//global error handler config:
+const AppError = require("./errors/appError");
+const globalErrorHandler = require("./errors/errorController");
+
+//making req.body available:
+const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+// By default, $ and . characters are removed completely and used for query injection protection:
+const mongoSanitize = require("express-mongo-sanitize");
 app.use(mongoSanitize());
-//Global Middlewares:
+
+//It helps you secure your Express apps by setting various HTTP headers :
 const helmet = require("helmet");
 app.use(helmet());
 
+// This will sanitize any data in req.body, req.query, and req.params for xss attack :
 const xss = require("xss-clean");
 app.use(xss());
-//Rate Limiter:
+
+//It helps for protecting bruteforce attack and DDOS attack by limiting no of request per IP address:
 const rateLimit = require("express-rate-limit");
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -21,13 +29,10 @@ const limiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
+app.use("/api", limiter);
 
-app.use("/api", rateLimit);
-//global error handler config:
-const AppError = require("./errors/appError");
-const globalErrorHandler = require("./errors/errorController");
-
-//basic passport configuration:
+// passport configuration:
+const passport = require("passport");
 require("./authConfig/passport-jwt");
 require("./authConfig/passport-google");
 app.use(passport.initialize());
