@@ -48,6 +48,7 @@ app.use("/api/v1/teacher", teacherRouter);
 
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {
+  // console.log("hello");
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 

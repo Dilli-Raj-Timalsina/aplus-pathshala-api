@@ -1,11 +1,13 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const AppError = require("../errors/appError");
+const AppError = require("./../errors/appError");
 
 const sendMail = require("./../utils/email");
 const catchAsync = require("../errors/catchAsync");
 const User = require("../models/studentSchema");
+
+const Course = require("./../models/courseSchema");
 
 //all functionality related to basic signup and login using jwt:
 const signToken = async (id) => {
@@ -50,7 +52,7 @@ const loginControl = catchAsync(async (req, res) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("Incorrect email or password", 401));
+    throw new AppError("Incorrect email or password", 401);
   }
   //3) If everything is ok: send token to the logged in user
   const token = await signToken(req.body);
@@ -115,14 +117,14 @@ const resetControl = catchAsync(async (req, res) => {
   const { userId, token, password } = req.body;
   //2) if user doesn't exist or token is invalid
   const user = await User.findOne({ _id: userId });
-  if (!user || !(await bcrypt.compare(token, user.child.token))) {
+  if (!user || !(await bcrypt.compare(token, user.resetToken.token))) {
     throw new AppError("Invalid or expired password reset token");
   }
   //3) hash the password and update
   const hash = await bcrypt.hash(password, 10);
   await User.updateOne({ password: hash });
   //4) change token value to empty string
-  await User.findOneAndUpdate({ _id: userId }, { "child.token": "" });
+  await User.findOneAndUpdate({ _id: userId }, { "resetToken.token": "" });
 
   //4) if reset is successful then send success message
   res
@@ -137,10 +139,15 @@ const logoutControl = catchAsync(async (req, res, next) => {
 
 //just for testing purpose
 const fakeControl = catchAsync(async (req, res, next) => {
-  const query = User.findById(req.body);
-  query.then((users) => {
-    console.log(users.fake());
+  const doc = new Course({
+    courseName: "Web dev Course",
+    parentRef: "643682d8d7cae9848e106aa1",
   });
+  doc.save().then((saved) => {});
+  const qu = await Course.findById("643a6aef074b8873da9e0dbc").populate(
+    "parentRef"
+  );
+
   res.end("fake responce ended");
 });
 

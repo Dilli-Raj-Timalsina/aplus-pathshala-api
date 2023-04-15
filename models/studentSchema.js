@@ -3,6 +3,7 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 const tokenSchema = require("./tokenSchema");
+
 const studentSchema = new Schema({
   name: {
     type: String,
@@ -46,10 +47,11 @@ const studentSchema = new Schema({
     required: false,
     default: 100,
   },
-  child: {
+  reseToken: {
     type: tokenSchema,
     default: () => ({}),
   },
+  course: [{ type: Schema.Types.ObjectId, ref: "Course", required: false }],
 });
 
 //Middleware
