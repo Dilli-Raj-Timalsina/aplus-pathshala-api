@@ -2,23 +2,23 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const courseSchema = new Schema({
-  Sector: {
+  sector: {
     required: true,
     type: String,
   },
-  Category: {
+  category: {
     required: true,
     type: String,
   },
-  Duration: {
+  duration: {
     type: Number,
     required: true,
   },
-  Price: {
+  price: {
     required: true,
     type: Number,
   },
-  Description: {
+  description: {
     required: true,
     type: String,
   },
@@ -29,6 +29,8 @@ const courseSchema = new Schema({
   student: [{ type: Schema.Types.ObjectId, ref: "Student", required: false }],
   review: [{ type: Schema.Types.ObjectId, ref: "Review", required: false }],
 });
+
+console.log(courseSchema.path("content"));
 
 const Course = mongoose.model("Course", courseSchema);
 
