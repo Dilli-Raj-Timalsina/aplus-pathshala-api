@@ -30,7 +30,7 @@ const courseSchema = new Schema({
   review: [{ type: Schema.Types.ObjectId, ref: "Review", required: false }],
 });
 
-console.log(courseSchema.path("content"));
+// console.log(courseSchema.path("content"));
 
 const Course = mongoose.model("Course", courseSchema);
 
