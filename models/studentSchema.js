@@ -7,7 +7,8 @@ const tokenSchema = require("./tokenSchema");
 const studentSchema = new Schema({
   name: {
     type: String,
-    required: false,
+    required: true,
+    unique: false,
   },
   email: {
     type: String,
@@ -47,7 +48,7 @@ const studentSchema = new Schema({
     required: false,
     default: 100,
   },
-  reseToken: {
+  resetToken: {
     type: tokenSchema,
     default: () => ({}),
   },

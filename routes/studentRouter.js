@@ -5,6 +5,7 @@ const {
   forgetControl,
   resetControl,
   fakeControl,
+  protect,
 } = require("../controllers/studentAuthController");
 
 // studentRouter route distributing:
@@ -12,7 +13,7 @@ router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/resetPassword").post(resetControl);
-router.route("/fake").post(fakeControl);
+router.route("/fake").post(protect, fakeControl);
 
 // router
 //   .route("/protected")
