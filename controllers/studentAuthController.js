@@ -12,8 +12,12 @@ const User = require("../models/studentSchema");
 const Course = require("./../models/courseSchema");
 
 // 1:) return new jwt based on passed payload
-const signToken = async (email) => {
-  return await jwt.sign({ email }, process.env.SECRET, {
+const signToken = async (user) => {
+  const payload = {
+    email: user.email,
+    _id: user._id,
+  };
+  return await jwt.sign(payload, process.env.SECRET, {
     expiresIn: process.env.EXPIRES_IN,
   });
 };
@@ -21,7 +25,7 @@ const signToken = async (email) => {
 //2:) This function sends cookie to the browser so that is saves the cookie and send atomatically
 // in next subsequent request
 const createSendToken = async (user, statusCode, res) => {
-  const token = await signToken(user.email);
+  const token = await signToken(user);
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -57,10 +61,9 @@ const protect = catchAsync(async (req, res, next) => {
   }
 
   // b) Verification token
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
+  const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
   // c) Check if user still exists
-  const currentUser = await User.findById(decoded.id);
+  const currentUser = await User.findById(decoded._id);
   if (!currentUser) {
     return next(
       new AppError(

@@ -49,10 +49,11 @@ const teacherSchema = new Schema({
     required: false,
     default: 100,
   },
-  child: {
+  resetToken: {
     type: tokenSchema,
     default: () => ({}),
   },
+  course: [{ type: Schema.Types.ObjectId, ref: "Course", required: false }],
 });
 
 teacherSchema.pre("save", async function (next) {

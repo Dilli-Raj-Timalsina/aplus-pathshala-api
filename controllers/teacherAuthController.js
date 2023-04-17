@@ -1,71 +1,129 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const AppError = require("../errors/appError");
+const { promisify } = require("util");
+
+const AppError = require("./../errors/appError");
 const catchAsync = require("../errors/catchAsync");
 
 const sendMail = require("./../utils/email");
 const User = require("../models/teacherSchema");
 
-//all functionality related to basic signup and login using jwt:
-const signToken = async (id) => {
-  return await jwt.sign({ id }, process.env.SECRET, {
+// 1:) return new jwt based on passed payload
+const signToken = async (user) => {
+  const payload = {
+    email: user.email,
+    _id: user._id,
+  };
+  return await jwt.sign(payload, process.env.SECRET, {
     expiresIn: process.env.EXPIRES_IN,
   });
 };
 
-const loginControl = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
+//2:) This function sends cookie to the browser so that is saves the cookie and send atomatically
+// in next subsequent request
+const createSendToken = async (user, statusCode, res) => {
+  const token = await signToken(user);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
-  //1)check if email or password exist:
-  if (!email || !password) {
-    throw new AppError("email or password not provided", 403);
-  }
-  // 2) Check if user exists && password is correct
-  const user = await User.findOne({ email }).select("+password");
+  res.cookie("jwt", token, cookieOptions);
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError("Incorrect email or password", 401));
-  }
-  //3) If everything is ok: send token to the logged in user
-  const token = await signToken(req.body);
-  res.status(200).json({
+  res.status(statusCode).json({
     status: "success",
     token: "Bearer " + token,
   });
+};
+
+//3:) protect unauthorized student from  courses ,jwt is extracted from authorization header
+//not from req.cookies
+const protect = catchAsync(async (req, res, next) => {
+  // a) Getting token and check of it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Please log in to get access.", 401)
+    );
+  }
+
+  // b) Verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
+  // c) Check if user still exists
+  const currentUser = await User.findById(decoded._id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        "The user belonging to this token does no longer exist.",
+        401
+      )
+    );
+  }
+
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
+  next();
 });
 
+//3:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
   const user = await User.create({
     ...req.body,
   });
 
   // if everything is ok :send token to the user
-  const token = await signToken(req.body);
-  res.status(200).json({
-    status: "success",
-    token: "Bearer " + token,
-  });
+  await createSendToken(user, 200, res);
 });
 
+//4:) login in user based on {email,password} and send jwt in cokkie
+const loginControl = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+
+  //a)check if email or password exist:
+  if (!email || !password) {
+    throw new AppError("email or password not provided", 403);
+  }
+  // b) Check if user exists && password is correct
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    throw new AppError("Incorrect email or password", 401);
+  }
+  //c) If everything is ok: send token to the logged in user
+  await createSendToken(user, 200, res);
+});
+
+//5:) this is 1st hit for forget password
 const forgetControl = catchAsync(async (req, res, next) => {
-  //1) check whether user exist or not
+  //a) check whether user exist or not
   const { email } = req.body;
   const user = await User.findOne({ email: email });
 
   if (!user) {
     throw new AppError("User does not exist");
   }
-  //2) generate reset token:
+  //b) generate reset token:
   const resetToken = crypto.randomBytes(32).toString("hex");
 
-  //3) update user's token with salted and hashed token :
+  //c) update user's token with salted and hashed token :
   const hash = await bcrypt.hash(resetToken, 10);
-  await User.findOneAndUpdate({ email: email }, { "child.token": hash });
+  await User.findOneAndUpdate({ email: email }, { "resetToken.token": hash });
 
-  //4) preparing credentials to send user an email:
-  let clientURL = "127.0.0.1:3000/api/v1/student";
-  const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`;
+  //d) preparing credentials to send user an email:
+  const link = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/student/passwordReset?token=${resetToken}&id=${user._id}`;
   const options = {
     email: email,
     subject: "Reset password A+ pathshala ",
@@ -73,35 +131,58 @@ const forgetControl = catchAsync(async (req, res, next) => {
     click the above link to reset your password, \n
     Please Notice that this is one time reset link and don't share with others`,
   };
-  //5) send reset password link to the user's email
+  //e) send reset password link to the user's email
   await sendMail(options);
 
-  //6) if everything succeds then send success message
+  //f) if everything succeds then send success message
   res.status(200).json({
     status: "success",
     message: "checkout your email to reset password",
   });
 });
 
-//after getting reset passport url with token and userId: reset the password
+//6:) this is 2nd redirected hit for forgetpassword
 const resetControl = catchAsync(async (req, res) => {
-  //1) getting user reset credential :
-  const { userId, token, password } = req.body;
-  //2) if user doesn't exist or token is invalid
+  //a) getting user reset credential :
+  const { url, password } = req.body;
+  //extract token and userId from url
+  const token = url.split("=")[1].split("&")[0];
+  const userId = url.split("=")[2];
+
+  //b) if user doesn't exist or token is invalid
   const user = await User.findOne({ _id: userId });
-  if (!user || !(await bcrypt.compare(token, user.child.token))) {
+  if (!user || !(await bcrypt.compare(token, user.resetToken.token))) {
     throw new AppError("Invalid or expired password reset token");
   }
-  //3) hash the password and update
+  //c) hash the password and update
   const hash = await bcrypt.hash(password, 10);
   await User.updateOne({ password: hash });
-  //4) change token value to empty string
-  await User.findOneAndUpdate({ _id: userId }, { "child.token": "" });
+  //d) change token value to empty string
+  await User.findOneAndUpdate({ _id: userId }, { "resetToken.token": "" });
 
-  //4) if reset is successful then send success message
+  //e) if reset is successful then send success message
   res
     .status(200)
-    .json({ status: "success", message: "password reset succesful" });
+    .json({ status: "success", message: "password reset successful" });
+});
+
+//7:) logout user by putting jwt ==null in user's browser cookie
+const logoutControl = catchAsync(async (req, res, next) => {
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+
+  res.cookie("jwt", null, cookieOptions);
+  res.end("logged out");
+});
+
+//just for testing purpose
+const fakeControl = catchAsync(async (req, res, next) => {
+  createSendToken("dillirajtimalsina354@gmail.com", 200, res);
 });
 
 module.exports = {
@@ -110,4 +191,6 @@ module.exports = {
   signToken,
   forgetControl,
   resetControl,
+  logoutControl,
+  fakeControl,
 };

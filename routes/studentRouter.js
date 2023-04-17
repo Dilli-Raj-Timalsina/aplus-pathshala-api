@@ -4,6 +4,7 @@ const {
   loginControl,
   forgetControl,
   resetControl,
+  logoutControl,
   fakeControl,
   protect,
 } = require("../controllers/studentAuthController");
@@ -13,12 +14,7 @@ router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/resetPassword").post(resetControl);
+router.route("/logout").get(logoutControl);
 router.route("/fake").post(protect, fakeControl);
-
-// router
-//   .route("/protected")
-//   .get(passport.authenticate("jwt", { session: false }), (req, res) => {
-//     res.end("authetication is successful");
-//   });
 
 module.exports = router;

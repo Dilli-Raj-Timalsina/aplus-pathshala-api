@@ -2,7 +2,10 @@ const catchAsync = require("./../errors/catchAsync");
 const AppError = require("./../errors/appError");
 const Course = require("./../models/courseSchema");
 
+const createCourse = async (req, res) => {};
+
 const getAllCourse = catchAsync(async (req, res) => {
+  console.log(req.user);
   res.end("all course");
 });
 const getCourse = catchAsync(async (req, res) => {});
