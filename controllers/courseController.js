@@ -2,7 +2,21 @@ const catchAsync = require("./../errors/catchAsync");
 const AppError = require("./../errors/appError");
 const Course = require("./../models/courseSchema");
 
-const createCourse = async (req, res) => {};
+const createCourse = catchAsync(async (req, res) => {
+  const course = await Course.create(req.body);
+  res.end("course successfully created");
+});
+
+const updateCourse = catchAsync(async (req, res) => {
+  const { id } = req.body;
+  const updated = await Course.findByIdAndUpdate(
+    id,
+    { duration: "18" },
+    { new: true }
+  );
+  console.log(updated);
+  res.end("updated");
+});
 
 const getAllCourse = catchAsync(async (req, res) => {
   console.log(req.user);
@@ -19,4 +33,6 @@ module.exports = {
   filterCourse,
   sortCourse,
   myCourse,
+  createCourse,
+  updateCourse,
 };

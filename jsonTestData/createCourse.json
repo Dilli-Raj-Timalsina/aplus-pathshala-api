@@ -1,0 +1,18 @@
+[
+  {
+    "sector": "Computer Science",
+    "category": "Web developement",
+    "duration": "12",
+    "price": "5000",
+    "description": "This is a description of the above course .This course is taught by Senior engineer . Dilli Raj Timalsina and Mr. ramlal yadav",
+    "content": "This is the main binary data of the course .It is in mp4 format"
+  },
+  {
+    "sector": "Business Studies",
+    "category": "finanance",
+    "duration": "22",
+    "price": "10000",
+    "description": "This is a description of the above course .This course is taught by Senior engineer . Dilli Raj Timalsina and Mr. ramlal yadav",
+    "content": "This is the main binary data of the course .It is in mp4 format"
+  }
+]

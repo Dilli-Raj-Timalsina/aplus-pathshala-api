@@ -192,5 +192,6 @@ module.exports = {
   forgetControl,
   resetControl,
   logoutControl,
+  protect,
   fakeControl,
 };

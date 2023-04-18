@@ -26,6 +26,8 @@ const courseSchema = new Schema({
     type: String,
     required: true,
   },
+  slug: String,
+  teacher: [{ type: Schema.Types.ObjectId, ref: "Teacher", required: false }],
   student: [{ type: Schema.Types.ObjectId, ref: "Student", required: false }],
   review: [{ type: Schema.Types.ObjectId, ref: "Review", required: false }],
 });

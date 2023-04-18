@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Gaurav Datta Bhatt",
+    "email": "bhattgaurav654@gmail.com",
+    "number": 9845353111,
+    "password": "thisisgauravpassword",
+    "passwordConfirm": "thisisgauravpassword"
+  },
+  {
+    "name": "Dilli Raj Timalsina",
+    "email": "dillirajtimalsina354@gmail.com",
+    "number": 987987297927,
+    "password": "thisisdillipassword",
+    "passwordConfirm": "thisisdillipassword"
+  },
+  {
+    "name": "stefie datta bhatta",
+    "email": "steffiekumariyadav@gmail.com",
+    "number": 98729729269,
+    "password": "thisissteffiepassword",
+    "passwordConfirm": "thisissteffiepassword"
+  }
+]
