@@ -14,7 +14,6 @@ const updateCourse = catchAsync(async (req, res) => {
     { duration: "18" },
     { new: true }
   );
-  console.log(updated);
   res.end("updated");
 });
 
