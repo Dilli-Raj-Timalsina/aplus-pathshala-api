@@ -1,37 +1,90 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
-const { Credentials } = require('@aws-sdk/types')
+const {
+    ListBucketsCommand,
+    CreateBucketCommand,
+    DeleteBucketCommand,
+    GetBucketLocationCommand,
+    DeleteObjectCommand,
+    ListObjectsCommand,
+    GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const { s3, params } = require("./credentialConfig");
 
-const params = {
-    Bucket: 'mybucketforapluspathshala', // The name of the bucket. For example, 'sample-bucket-101'.
-    Key: 'textfile.txt', // The name of the object. For example, 'sample_upload.txt'.
-    Body: 'Hello world', // The content of the object. For example, 'Hello world!".
-}
-
-// Set the AWS Region.
-const REGION = '' //e.g. "us-east-1"
-const ACCESS_KEY_ID = ''
-const SECRET_ACCESS_KEY = ''
-
-const s3 = new S3Client({
-    region: REGION,
-    credentials: {
-        accessKeyId: ACCESS_KEY_ID,
-        secretAccessKey: SECRET_ACCESS_KEY,
+//Bucket tasks starts over here
+const inputCreate = {
+    Bucket: "thistednewket--111",
+    CreateBucketConfiguration: {
+        LocationConstraint: "eu-west-1",
     },
-})
+};
+const inputDelete = {
+    Bucket: "thisiscreatednewket--111",
+};
 
-const run = async () => {
-    // Create an Amazon S3 bucket.
-    try {
-        console.log('first')
-        const command = new PutObjectCommand(params)
-        console.log('second')
-        const data = await s3.send(command)
-        console.log('third')
-        console.log(data)
-        console.log('Successfully created a bucket called ')
-    } catch (err) {
-        console.log('Error', err)
-    }
-}
-run()
+const sendCommandExecutionRequestToAWS = async (command) => {
+    const responce = await s3.send(command);
+    return responce;
+};
+
+const createBucket = async (input) => {
+    const command = new CreateBucketCommand(input);
+    const responce = await sendCommandExecutionRequestToAWS(command);
+    return responce;
+};
+
+const deleteBucket = async (input) => {
+    const command = new DeleteBucketCommand(input);
+    const responce = await sendCommandExecutionRequestToAWS(command);
+    return responce;
+};
+
+const listBuckets = async () => {
+    const input = {};
+    const command = new ListBucketsCommand(input);
+    const responce = await sendCommandExecutionRequestToAWS(command);
+    console.log(responce);
+};
+
+const getBucketLocation = async () => {
+    const input = {
+        Bucket: "thisiscreatednewbucket--111",
+    };
+    const command = new GetBucketLocationCommand(input);
+    const response = await sendCommandExecutionRequestToAWS(command);
+    console.log(response);
+};
+
+////////////////////////Bucket Tasks Done/////////////////////
+// getBucketLocation();
+//////////////////////////Object Tasks Starts Here////////////////////////
+
+const deleteObject = async () => {
+    const input = {
+        // DeleteObjectRequest
+        Bucket: "thisiscreatednewbucket--111",
+        Key: "keys.txt",
+    };
+    const command = new DeleteObjectCommand(input);
+    await sendCommandExecutionRequestToAWS(command);
+};
+
+const listAllObject = async () => {
+    const input = {
+        Bucket: "thisiscreatednewbucket--111",
+    };
+    const command = new ListObjectsCommand(input);
+    const responce = await sendCommandExecutionRequestToAWS(command);
+    return responce;
+};
+
+const getObject = async () => {
+    const input = {
+        // GetObjectRequest
+        Bucket: "thisiscreatednewbucket--111",
+        Key: "textfile.txt",
+    };
+    const command = new GetObjectCommand(input);
+    const responce = await sendCommandExecutionRequestToAWS(command);
+    console.log(responce);
+};
+
+getObject();
