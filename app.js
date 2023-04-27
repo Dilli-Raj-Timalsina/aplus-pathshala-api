@@ -1,27 +1,7 @@
 const express = require("express");
 const app = express();
-
-const multer = require("multer");
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "uploads");
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "." + file.mimetype.split("/")[1];
-        cb(null, file.fieldname + "-" + uniqueSuffix);
-    },
-});
-const upload = multer({ storage: storage });
-
-app.post("/upload", upload.single("textfile"), function (req, res, next) {
-    console.log(req.file);
-    res.end("success");
-});
-
-app.post("/multiUpload", upload.array("photos", 12), function (req, res, next) {
-    console.log(req.files);
-    res.end("success");
-});
+const upload = require("./awsConfig/courseAndAWSController");
+const { putObject, putObjects } = require("./awsConfig/sampleClient");
 
 //global error handler config:
 const AppError = require("./errors/appError");
