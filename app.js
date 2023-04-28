@@ -1,7 +1,17 @@
 const express = require("express");
 const app = express();
-const upload = require("./awsConfig/courseAndAWSController");
-const { putObject, putObjects } = require("./awsConfig/sampleClient");
+const upload = require("./awsConfig/multerSetup");
+const {
+    putObject,
+    putObjects,
+    deleteObject,
+    listAllObject,
+    getObject,
+} = require("./awsConfig/objectControl");
+
+app.post("/uploadphoto", upload.single("myphoto"), (req, res) => {
+    res.end("done");
+});
 
 //global error handler config:
 const AppError = require("./errors/appError");

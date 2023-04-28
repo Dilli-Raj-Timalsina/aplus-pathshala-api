@@ -2,15 +2,18 @@
 const multer = require("multer");
 const AppError = require("../errors/appError");
 
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, "uploads");
-//     },
-//     filename: function (req, file, cb) {
-//         const uniqueSuffix = Date.now() + "." + file.mimetype.split("/")[1];
-//         cb(null, file.fieldname + "-" + uniqueSuffix);
-//     },
-// });
+// /*
+// setup for Disk storage/to store on your current pc/machine
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "uploads");
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + "." + file.mimetype.split("/")[1];
+        cb(null, file.fieldname + "-" + uniqueSuffix);
+    },
+});
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.split("/")[0] === "image") {
@@ -19,13 +22,16 @@ const fileFilter = (req, file, cb) => {
         cb(new AppError("Only Image can be inserted"), false);
     }
 };
+const upload = multer({ dest: "./uploads" });
+// */
 
-const storage = multer.memoryStorage();
+//setup for cloud storage / to create a buffer
+// const storage = multer.memoryStorage();
 
-const upload = multer({
-    storage,
-    fileFilter,
-    limits: { fileSize: 1000000000 },
-});
+// const upload = multer({
+//     storage,
+//     // fileFilter,
+//     // limits: { fileSize: 1000000000 },
+// });
 
 module.exports = upload;

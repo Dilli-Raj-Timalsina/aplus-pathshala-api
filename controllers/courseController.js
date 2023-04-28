@@ -26,16 +26,16 @@ const getAllCourse = catchAsync(async (req, res) => {
 });
 const getCourse = catchAsync(async (req, res) => {});
 const deleteCourse = catchAsync(async (req, res) => {});
-app.post("/upload", upload.single("textfile"), async (req, res, next) => {
-    const results = await putObject(req.file);
-    console.log(results);
-    return res.json({ status: "success" });
-});
+// app.post("/upload", upload.single("textfile"), async (req, res, next) => {
+//     const results = await putObject(req.file);
+//     console.log(results);
+//     return res.json({ status: "success" });
+// });
 
-app.post("/multiUpload", upload.array("photos", 12), async (req, res, next) => {
-    await putObjects(req.files);
-    return res.json({ status: "success" });
-});
+// app.post("/multiUpload", upload.array("photos", 12), async (req, res, next) => {
+//     await putObjects(req.files);
+//     return res.json({ status: "success" });
+// });
 
 module.exports = {
     getAllCourse,

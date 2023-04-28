@@ -1,4 +1,4 @@
-const s3 = require("./credentialConfig");
+const s3 = require("./credential");
 const {
     DeleteObjectCommand,
     ListObjectsCommand,
@@ -51,4 +51,10 @@ const putObjects = async (input, files) => {
     );
 };
 
-module.exports = { putObject, putObjects };
+module.exports = {
+    putObject,
+    putObjects,
+    deleteObject,
+    listAllObject,
+    getObject,
+};
