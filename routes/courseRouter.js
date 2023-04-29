@@ -1,16 +1,19 @@
 const {
-    getAllCourse,
-    createCourse,
-    updateCourse,
-    deleteCourse,
+    uploadSingleFile,
+    uploadMultipleFile,
+    getFile,
+    ListAllFiles,
 } = require("./../controllers/courseController");
-const { protect } = require("./../controllers/teacherAuthController");
+
+const upload = require("./../awsConfig/multerSetup");
+
 const router = require("express").Router();
 
-// router.use(protect);
-router.route("/upload").post(createCourse);
-// router.route("/update").post(updateCourse);
-// router.route("/delete").post(deleteCourse);
-// router.route("/:id")
+router.route("/upload-single").post(upload.single("file"), uploadSingleFile);
+router
+    .route("/upload-multiple")
+    .post(upload.array("file", 50), uploadMultipleFile);
+router.route("/get-single").get(getFile);
+router.route("/getallfile").get(ListAllFiles);
 
 module.exports = router;
