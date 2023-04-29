@@ -1,7 +1,6 @@
 const s3 = require("./credential");
 const {
-    DeleteObjectCommand,
-    ListObjectsCommand,
+    ListObjectsV2Command,
     GetObjectCommand,
     PutObjectCommand,
 } = require("@aws-sdk/client-s3");
@@ -9,52 +8,35 @@ const {
 //It is used to give user the access to read object for certain time via secure link:
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-const deleteObject = async (input) => {
-    const command = new DeleteObjectCommand(input);
-    const responce = await s3.send(command);
-    return responce;
-};
-
+//It returns a list of object from the provided input folder
 const listAllObject = async (input) => {
-    const command = new ListObjectsCommand(input);
-    const responce = await s3.send(command);
-    return responce;
+    const command = new ListObjectsV2Command(input);
+    const output = await s3.send(command);
+    return output.Contents;
 };
 
+//It returns signed-url of provided folder object-key
 const getObject = async (input) => {
     const command = new GetObjectCommand(input);
-    const responce = await s3.send(command);
-    return responce;
-
-    //  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-    //  console.log(url);
+    return await getSignedUrl(s3, command, { expiresIn: 36000 });
 };
 
-const putObject = async (input, file) => {
+//It inserts single file in provided input bucket's folder
+const putObject = async (input) => {
     const command = new PutObjectCommand(input);
-    const responce = await s3.send(command);
-    return responce;
+    return await s3.send(command);
 };
 
-const putObjects = async (input, files) => {
-    const inputs = files.map((file) => {
-        return {
-            // Bucket: "thisiscreatednewbucket--111",
-            // Key: `thisisimagebject${count}.jpg`,
-            // Body: file.buffer,
-            // ContentType: file.mimetype,
-        };
-    });
-
+//It inserts multiple file in provided input bucket's folder
+const putObjects = async (inputs) => {
     return await Promise.all(
         inputs.map((input) => s3.send(new PutObjectCommand(input)))
     );
 };
 
 module.exports = {
+    listAllObject,
     putObject,
     putObjects,
-    deleteObject,
-    listAllObject,
     getObject,
 };
