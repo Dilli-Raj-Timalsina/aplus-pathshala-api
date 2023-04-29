@@ -3,6 +3,7 @@ const {
     uploadMultipleFile,
     getFile,
     ListAllFiles,
+    deleteFile,
 } = require("./../controllers/courseController");
 
 const upload = require("./../awsConfig/multerSetup");
@@ -15,5 +16,5 @@ router
     .post(upload.array("file", 50), uploadMultipleFile);
 router.route("/get-single").get(getFile);
 router.route("/getallfile").get(ListAllFiles);
-
+router.route("/deletefile").post(deleteFile);
 module.exports = router;

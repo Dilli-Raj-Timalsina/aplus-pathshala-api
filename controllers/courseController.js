@@ -5,6 +5,7 @@ const {
     putObjects,
     getObject,
     listAllObject,
+    deleteObject,
 } = require("./../awsConfig/objectControl");
 
 //upload the single file in corresponding chapter/folder of corresponding bucket/course:
@@ -95,9 +96,21 @@ const ListAllFiles = catchAsync(async (req, res, next) => {
     res.status(200).json(allObjects);
 });
 
+const deleteFile = catchAsync(async (req, res, next) => {
+    const { bucketName, folderName, keyName } = req.body;
+
+    const input = {
+        Bucket: bucketName,
+        Key: `${folderName}/${keyName}`,
+    };
+    await deleteObject(input);
+    res.end("successfully deleted file");
+});
+
 module.exports = {
     uploadSingleFile,
     uploadMultipleFile,
     getFile,
     ListAllFiles,
+    deleteFile,
 };
