@@ -1,46 +1,103 @@
 const catchAsync = require("./../errors/catchAsync");
-const AppError = require("./../errors/appError");
-const Course = require("./../models/courseSchema");
 
-//
+const {
+    putObject,
+    putObjects,
+    getObject,
+    listAllObject,
+} = require("./../awsConfig/objectControl");
 
-const uploadCourse = catchAsync(async (req, res, next) => {
-    const results = await putObject(req.file);
-    console.log(results);
-    return res.json({ status: "success" });
+//upload the single file in corresponding chapter/folder of corresponding bucket/course:
+const uploadSingleFile = catchAsync(async (req, res, next) => {
+    // ContentEncoding metadata to 'gzip'
+    //  which can be used to compress the video data before uploading it to S3.
+    const { bucketName, folderName } = req.body;
+    const { mimetype } = req.file;
+    let input;
+    if (mimetype === "video/mp4") {
+        input = {
+            Bucket: bucketName,
+            Key: `${folderName}/${Date.now()}-${req.file.originalname}`,
+            Body: req.file.buffer,
+            ContentType: "video/mp4",
+            ContentDisposition: "inline",
+            CacheControl: "max-age=3153600, public",
+        };
+    } else {
+        input = {
+            Bucket: bucketName,
+            Key: `${folderName}/${Date.now()}-${req.file.originalname}`,
+            Body: req.file.buffer,
+        };
+    }
+    await putObject(input);
+    res.end("single upload succesfull");
 });
 
-const updateCourse = catchAsync(async (req, res) => {
-    const { id } = req.body;
-    const updated = await Course.findByIdAndUpdate(
-        id,
-        { duration: "18" },
-        { new: true }
-    );
-    res.end("updated");
+//upload the multiple file in corresponding chapter/folder of corresponding bucket/course:
+const uploadMultipleFile = catchAsync(async (req, res, next) => {
+    const { bucketName, folderName } = req.body;
+
+    const inputs = req.files.map((file) => {
+        const { mimetype } = file;
+        if (mimetype === "video/mp4") {
+            return {
+                Bucket: bucketName,
+                Key: `${folderName}/${Date.now()}-${file.originalname}`,
+                Body: file.buffer,
+                ContentType: "video/mp4",
+                ContentDisposition: "inline",
+                CacheControl: "max-age=3153600, public",
+            };
+        } else {
+            return {
+                Bucket: bucketName,
+                Key: `${folderName}/${Date.now()}-${file.originalname}`,
+                Body: file.buffer,
+            };
+        }
+    });
+
+    await putObjects(inputs);
+    res.end("multiple upload sucessfull");
 });
 
-const getAllCourse = catchAsync(async (req, res) => {
-    console.log(req.user);
-    res.end("all course");
-});
-const getCourse = catchAsync(async (req, res) => {});
-const deleteCourse = catchAsync(async (req, res) => {});
-// app.post("/upload", upload.single("textfile"), async (req, res, next) => {
-//     const results = await putObject(req.file);
-//     console.log(results);
-//     return res.json({ status: "success" });
-// });
+//get signed url of particular bucket-folder-key
+const getFile = catchAsync(async (req, res, next) => {
+    const { bucketName, folderName, keyName } = req.body;
+    let input;
 
-// app.post("/multiUpload", upload.array("photos", 12), async (req, res, next) => {
-//     await putObjects(req.files);
-//     return res.json({ status: "success" });
-// });
+    if (keyName.split(".")[1] === "mp4") {
+        input = {
+            Bucket: bucketName,
+            Key: `${folderName}/${keyName}`,
+            ResponseContentType: "video/mp4",
+        };
+    } else {
+        input = {
+            Bucket: bucketName,
+            Key: `${folderName}/${keyName}`,
+        };
+    }
+    const url = await getObject(input);
+    res.end(url);
+});
+
+//list all objects from particular folder
+const ListAllFiles = catchAsync(async (req, res, next) => {
+    const { bucketName, folderName } = req.body;
+    const input = {
+        Bucket: bucketName,
+        Prefix: `${folderName}/`,
+    };
+    const allObjects = await listAllObject(input);
+
+    res.status(200).json(allObjects);
+});
 
 module.exports = {
-    getAllCourse,
-    getCourse,
-    uploadCourse,
-    updateCourse,
-    deleteCourse,
+    uploadSingleFile,
+    uploadMultipleFile,
+    getFile,
+    ListAllFiles,
 };
