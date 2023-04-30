@@ -1,9 +1,10 @@
-const s3 = require("./credentialConfig");
+const s3 = require("./credential");
 const {
     ListBucketsCommand,
     CreateBucketCommand,
     DeleteBucketCommand,
     GetBucketLocationCommand,
+    HeadBucketCommand,
 } = require("@aws-sdk/client-s3");
 
 //All bucket related operations : CRUD operations,
@@ -32,6 +33,16 @@ const getBucketLocation = async (input) => {
     return responce;
 };
 
+const existBucket = async (input) => {
+    const command = new HeadBucketCommand(input);
+    return await s3.send(command);
+};
 ////////////////////////Bucket Tasks Done/////////////////////
 
-module.exports = { createBucket, listBuckets, deleteBucket, getBucketLocation };
+module.exports = {
+    createBucket,
+    listBuckets,
+    deleteBucket,
+    getBucketLocation,
+    existBucket,
+};

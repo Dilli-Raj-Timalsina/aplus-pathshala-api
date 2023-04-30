@@ -4,6 +4,7 @@ const {
     GetObjectCommand,
     PutObjectCommand,
     DeleteObjectCommand,
+    DeleteObjectsCommand,
 } = require("@aws-sdk/client-s3");
 
 //It is used to give user the access to read object for certain time via secure link:
@@ -41,10 +42,17 @@ const deleteObject = async (input) => {
     return await s3.send(command);
 };
 
+//delete multiple  objects at one request
+const deleteObjects = async (input) => {
+    const command = new DeleteObjectsCommand(input);
+    return await s3.send(command);
+};
+
 module.exports = {
     listAllObject,
     putObject,
     putObjects,
     getObject,
     deleteObject,
+    deleteObjects,
 };
