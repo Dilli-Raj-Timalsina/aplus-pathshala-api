@@ -11,12 +11,12 @@ const {
 const { existBucket, createBucket } = require("./../awsConfig/bucketControl");
 const AppError = require("../errors/appError");
 
-//upload the single file in corresponding chapter/folder of corresponding bucket/course:
+//upload  single file in corresponding chapter/folder of corresponding bucket/course:
 const uploadSingleFile = catchAsync(async (req, res, next) => {
     const { bucketName, folderName } = req.body;
     const { mimetype } = req.file;
 
-    // 1. Check if the specified bucket exists
+    //  Check if the specified bucket exists
     const isExist = (await existBucket({ Bucket: bucketName })).$metadata
         .httpStatusCode;
     if (!isExist) {
@@ -24,7 +24,7 @@ const uploadSingleFile = catchAsync(async (req, res, next) => {
     }
 
     let input;
-    // 2. Set the input parameters based on the mimetype of the file
+    // Set the input parameters based on the mimetype of the file
     if (mimetype === "video/mp4") {
         input = {
             Bucket: bucketName,
@@ -41,20 +41,26 @@ const uploadSingleFile = catchAsync(async (req, res, next) => {
             Body: req.file.buffer,
         };
     }
-    // 3. Upload the file to S3
+    // Upload the file to S3
     await putObject(input);
 
-    // 4. Send response to client
+    //  Send response to client
     res.end("single upload succesfull");
 });
 
-//upload the multiple file in corresponding chapter/folder of corresponding bucket/course:
+// Uploads multiple files to the specified folder in the corresponding bucket/course on AWS S3
 const uploadMultipleFile = catchAsync(async (req, res, next) => {
+    // Get the bucket name and folder name from the request body
     const { bucketName, folderName } = req.body;
 
+    // Create an array of input objects for each file to be uploaded
     const inputs = req.files.map((file) => {
+        // Get the mimetype of the file
         const { mimetype } = file;
+
+        // Set the input parameters based on the mimetype of the file
         if (mimetype === "video/mp4") {
+            // If the file is an mp4 video, set additional properties for the input object
             return {
                 Bucket: bucketName,
                 Key: `${folderName}/${Date.now()}-${file.originalname}`,
@@ -64,6 +70,7 @@ const uploadMultipleFile = catchAsync(async (req, res, next) => {
                 CacheControl: "max-age=3153600, public",
             };
         } else {
+            // If the file is not an mp4 video, set only the common properties for the input object
             return {
                 Bucket: bucketName,
                 Key: `${folderName}/${Date.now()}-${file.originalname}`,
@@ -72,8 +79,11 @@ const uploadMultipleFile = catchAsync(async (req, res, next) => {
         }
     });
 
+    // Upload all the files to S3 using the putObjects function
     await putObjects(inputs);
-    res.end("multiple upload sucessfull");
+
+    // Send a success response to the client
+    res.end("Multiple file upload successful");
 });
 
 //get signed url of particular bucket-folder-key

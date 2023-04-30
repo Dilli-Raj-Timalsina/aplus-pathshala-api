@@ -1,3 +1,5 @@
+const router = require("express").Router();
+const upload = require("./../awsConfig/multerSetup"); // Multer setup for file uploads
 const {
     uploadSingleFile,
     uploadMultipleFile,
@@ -5,20 +7,29 @@ const {
     ListAllFiles,
     deleteFile,
     deleteEntireFolder,
-} = require("./../controllers/courseController");
+    createNewCourse,
+} = require("./../controllers/courseController"); // Importing controller functions for handling requests
 
-const upload = require("./../awsConfig/multerSetup");
-const { createNewCourse } = require("../controllers/courseController");
+// Routes for creating courses
+router.route("/upload-single").post(
+    upload.single("file"), // Middleware for processing single file uploads
+    uploadSingleFile // Controller function for handling single file upload
+);
+router.route("/upload-multiple").post(
+    upload.array("file", 50), // Middleware for processing multiple file uploads (up to 50 files)
+    uploadMultipleFile // Controller function for handling multiple file uploads
+);
+router.route("/createCourse").post(
+    upload.array("file", 50), // Middleware for processing multiple file uploads (up to 50 files)
+    createNewCourse // Controller function for creating a new course
+);
 
-const router = require("express").Router();
+// Routes for getting courses
+router.route("/get-file").get(getFile); // Controller function for getting a file by filename
+router.route("/listallfile").get(ListAllFiles); // Controller function for getting a list of all files in the bucket
 
-router.route("/upload-single").post(upload.single("file"), uploadSingleFile);
-router
-    .route("/upload-multiple")
-    .post(upload.array("file", 50), uploadMultipleFile);
-router.route("/get-single").get(getFile);
-router.route("/getallfile").get(ListAllFiles);
-router.route("/deletefile").post(deleteFile);
-router.route("/deleteFolder").post(deleteEntireFolder);
-router.route("/createCourse").post(upload.array("file", 50), createNewCourse);
+// Routes for deleting courses
+router.route("/deletefile").post(deleteFile); // Controller function for deleting a file by filename
+router.route("/deleteFolder").post(deleteEntireFolder); // Controller function for deleting an entire folder and its contents
+
 module.exports = router;
