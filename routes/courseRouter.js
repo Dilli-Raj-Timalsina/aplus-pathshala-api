@@ -11,16 +11,16 @@ const {
 } = require("./../controllers/courseController"); // Importing controller functions for handling requests
 
 // Routes for creating courses
-router.route("/upload-single").post(
-    upload.single("file"), // Middleware for processing single file uploads
+router.route("/uploadFile").post(
+    upload.single("binary"), // Middleware for processing single file uploads
     uploadSingleFile // Controller function for handling single file upload
 );
-router.route("/upload-multiple").post(
-    upload.array("file", 50), // Middleware for processing multiple file uploads (up to 50 files)
+router.route("/uploadFiles").post(
+    upload.array("binary", 50), // Middleware for processing multiple file uploads (up to 50 files)
     uploadMultipleFile // Controller function for handling multiple file uploads
 );
 router.route("/createCourse").post(
-    upload.array("file", 50), // Middleware for processing multiple file uploads (up to 50 files)
+    upload.array("binary", 50), // Middleware for processing multiple file uploads (up to 50 files)
     createNewCourse // Controller function for creating a new course
 );
 

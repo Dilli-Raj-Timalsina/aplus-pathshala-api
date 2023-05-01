@@ -1,4 +1,5 @@
 const catchAsync = require("./../errors/catchAsync");
+const Course = require("./../models/courseSchema");
 
 const {
     putObject,
@@ -133,33 +134,59 @@ const deleteFile = catchAsync(async (req, res, next) => {
 
 //create brand new course:
 const createNewCourse = catchAsync(async (req, res, next) => {
-    const { bucketName, folderName } = req.body;
-    //1: create a new bucket:
-    const input = { Bucket: bucketName };
-    await createBucket(input);
-
-    //2: upload multiple file in course
-    const inputs = req.files.map((file) => {
-        const { mimetype } = file;
-        if (mimetype === "video/mp4") {
-            return {
-                Bucket: bucketName,
-                Key: `${folderName}/${Date.now()}-${file.originalname}`,
-                Body: file.buffer,
-                ContentType: "video/mp4",
-                ContentDisposition: "inline",
-                CacheControl: "max-age=3153600, public",
-            };
-        } else {
-            return {
-                Bucket: bucketName,
-                Key: `${folderName}/${Date.now()}-${file.originalname}`,
-                Body: file.buffer,
-            };
-        }
+    const {
+        bucketName,
+        folderName,
+        title,
+        subtitle,
+        description,
+        price,
+        discount,
+        language,
+        syllabus,
+        requirements,
+    } = req.body;
+    //before doing all the cloud work first lets  do database work:
+    const doc = new Course({
+        title,
+        subtitle,
+        description,
+        price,
+        discount,
+        language,
+        syllabus,
+        requirements,
     });
 
-    await putObjects(inputs);
+    doc.save().then((updated) => {
+        console.log(updated);
+    });
+    //1: create a new bucket:
+    const input = { Bucket: bucketName };
+    // await createBucket(input);
+
+    // 2: upload multiple file in course
+    // const inputs = req.files.map((file) => {
+    //     const { mimetype } = file;
+    //     if (mimetype === "video/mp4") {
+    //         return {
+    //             Bucket: bucketName,
+    //             Key: `${folderName}/${Date.now()}-${file.originalname}`,
+    //             Body: file.buffer,
+    //             ContentType: "video/mp4",
+    //             ContentDisposition: "inline",
+    //             CacheControl: "max-age=3153600, public",
+    //         };
+    //     } else {
+    //         return {
+    //             Bucket: bucketName,
+    //             Key: `${folderName}/${Date.now()}-${file.originalname}`,
+    //             Body: file.buffer,
+    //         };
+    //     }
+    // });
+
+    // await putObjects(inputs);
     res.end("New Course Successfully created");
 });
 

@@ -39,7 +39,7 @@ const courseSchema = new Schema({
     },
     duration: {
         type: Number,
-        required: true,
+        required: false,
     },
     language: {
         type: String,
@@ -72,10 +72,7 @@ const courseSchema = new Schema({
         trim: true,
         maxlength: 5000,
     },
-    content: {
-        type: String,
-        required: true,
-    },
+
     createdAt: {
         type: Date,
         default: Date.now,
@@ -85,6 +82,14 @@ const courseSchema = new Schema({
         default: Date.now,
     },
     syllabus: {
+        type: String,
+        required: false,
+    },
+    thumbnail: {
+        type: String,
+        required: false,
+    },
+    content: {
         type: String,
         required: false,
     },

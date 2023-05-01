@@ -29,7 +29,7 @@ const AppError = require("../errors/appError");
 const storage = multer.memoryStorage();
 
 const upload = multer({
-    storage,
+    storage: storage,
     // fileFilter,
     // limits: { fileSize: 1000000000 },
 });
