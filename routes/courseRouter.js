@@ -25,8 +25,8 @@ router.route("/createCourse").post(
 );
 
 // Routes for getting courses
-router.route("/get-file").get(getFile); // Controller function for getting a file by filename
-router.route("/listallfile").get(ListAllFiles); // Controller function for getting a list of all files in the bucket
+router.route("/getfile").get(getFile); // Controller function for getting a file by filename
+router.route("/listAllfile").get(ListAllFiles); // Controller function for getting a list of all files in the bucket
 
 // Routes for deleting courses
 router.route("/deletefile").post(deleteFile); // Controller function for deleting a file by filename
