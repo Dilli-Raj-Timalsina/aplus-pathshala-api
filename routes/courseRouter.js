@@ -20,16 +20,16 @@ router.route("/uploadFiles").post(
     uploadMultipleFile // Controller function for handling multiple file uploads
 );
 router.route("/createCourse").post(
-    upload.array("binary", 50), // Middleware for processing multiple file uploads (up to 50 files)
+    upload.single("binary"), // Middleware for processing multiple file uploads (up to 50 files)
     createNewCourse // Controller function for creating a new course
 );
 
 // Routes for getting courses
-router.route("/getfile").get(getFile); // Controller function for getting a file by filename
-router.route("/listAllfile").get(ListAllFiles); // Controller function for getting a list of all files in the bucket
+router.route("/getFile").get(getFile); // Controller function for getting a file by filename
+router.route("/listAllFiles").get(ListAllFiles); // Controller function for getting a list of all files in the bucket
 
 // Routes for deleting courses
-router.route("/deletefile").post(deleteFile); // Controller function for deleting a file by filename
+router.route("/deleteFile").post(deleteFile); // Controller function for deleting a file by filename
 router.route("/deleteFolder").post(deleteEntireFolder); // Controller function for deleting an entire folder and its contents
 
 module.exports = router;

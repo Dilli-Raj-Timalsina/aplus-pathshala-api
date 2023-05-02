@@ -85,6 +85,10 @@ const courseSchema = new Schema({
         type: String,
         required: false,
     },
+    bucketName: {
+        type: String,
+        required: true,
+    },
     thumbnail: {
         type: String,
         required: false,
