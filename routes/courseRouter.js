@@ -1,23 +1,25 @@
 const router = require("express").Router();
 const upload = require("./../awsConfig/multerSetup"); // Multer setup for file uploads
 const {
-    uploadSingleFile,
-    uploadMultipleFile,
+    editFolder,
+    uploadChapter,
+    createNewCourse,
+} = require("./../controllers/courseController");
+const {
     getFile,
     ListAllFiles,
     deleteFile,
     deleteEntireFolder,
-    createNewCourse,
-} = require("./../controllers/courseController"); // Importing controller functions for handling requests
+} = require("./../controllers/getAndDeleteFileController");
 
 // Routes for creating courses
-router.route("/uploadFile").post(
+router.route("/editFolder").post(
     upload.single("binary"), // Middleware for processing single file uploads
-    uploadSingleFile // Controller function for handling single file upload
+    editFolder // Controller function for handling single file upload
 );
-router.route("/uploadFiles").post(
+router.route("/uploadFolder").post(
     upload.array("binary", 50), // Middleware for processing multiple file uploads (up to 50 files)
-    uploadMultipleFile // Controller function for handling multiple file uploads
+    uploadChapter // Controller function for handling multiple file uploads
 );
 router.route("/createCourse").post(
     upload.single("binary"), // Middleware for processing multiple file uploads (up to 50 files)

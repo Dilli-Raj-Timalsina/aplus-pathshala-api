@@ -3,28 +3,17 @@ const AppError = require("../errors/appError");
 const Course = require("../models/courseSchema");
 const s3 = require("../awsConfig/credential");
 
-//It is used to give user the access to read object for certain time via secure link:
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const {
-    ListObjectsV2Command,
-    GetObjectCommand,
-    PutObjectCommand,
-    DeleteObjectCommand,
-    DeleteObjectsCommand,
-} = require("@aws-sdk/client-s3");
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { createBucket } = require("../awsConfig/bucketControl");
 
-const { existBucket, createBucket } = require("../awsConfig/bucketControl");
-
-//helper function:
-//It return input command according to file type i.e mimetype
-const returnInputAccMimetype = (file, body) => {
+const returnInputAccMimetype = (file, body, key) => {
     const { bucketName, folderName } = body;
     const { mimetype } = file;
 
     if (mimetype == "video/mp4") {
         return {
             Bucket: bucketName,
-            Key: `${folderName}/${Date.now()}-${file.originalname}`,
+            Key: key,
             Body: file.buffer,
             ContentType: "video/mp4",
             ContentDisposition: "inline",
@@ -33,124 +22,130 @@ const returnInputAccMimetype = (file, body) => {
     } else {
         return {
             Bucket: bucketName,
-            Key: `${folderName}/${Date.now()}-${file.originalname}`,
+            Key: key,
             Body: file.buffer,
         };
     }
 };
 
-//
-//
-//
-//
-//1:) upload  single file in corresponding chapter/folder of corresponding bucket/course:
-const uploadSingleFile = catchAsync(async (req, res, next) => {
-    const { bucketName } = req.body;
-    const { mimetype } = req.file;
+//return true if there is content with folderName exist
+const doesExist = async (bucketName, folderName) => {
+    return !!(await Course.findOne({
+        bucketName: bucketName,
+        "content.folderName": folderName,
+    }));
+};
 
-    //  Check if the specified bucket exists
-    const isExist =
-        (await existBucket({ Bucket: bucketName })).$metadata.httpStatusCode !==
-        "200";
-    if (!isExist) {
-        return new AppError("Bucket/Course doesnot exist");
-    }
+//1:) Edit Folder title of provided bucketName/folderName
+const editFolder = catchAsync(async (req, res, next) => {
+    const { bucketName, folderName, folderTitle } = req.body;
 
-    //upload file to aws
-    const input = returnInputAccMimetype(mimetype, req.file, req.body);
-    const command = new PutObjectCommand(input);
-    await s3.send(command);
-
-    res.end("single file upload successfull");
-});
-
-//
-//
-//
-//2:) Uploads multiple files to the specified folder in the corresponding bucket/course
-const uploadMultipleFile = catchAsync(async (req, res, next) => {
-    const inputs = req.files.map((file) => {
-        return returnInputAccMimetype(file, req.body);
-    });
-
-    //upload all files
-    await Promise.all(
-        inputs.map((input) => s3.send(new PutObjectCommand(input)))
+    await Course.findOneAndUpdate(
+        { bucketName: bucketName, "content.folderName": folderName },
+        {
+            $set: { "content.$.folderTitle": folderTitle },
+        }
     );
-    res.end("Multiple file upload successful");
-});
-
-//
-//
-//
-//3:) get signed url of particular bucket-folder-key
-const getFile = catchAsync(async (req, res, next) => {
-    const { bucketName, folderName, keyName } = req.body;
-    let input;
-
-    if (keyName.split(".")[1] === "mp4") {
-        input = {
-            Bucket: bucketName,
-            Key: `${folderName}/${keyName}`,
-            ResponseContentType: "video/mp4",
-        };
-    } else {
-        input = {
-            Bucket: bucketName,
-            Key: `${folderName}/${keyName}`,
-        };
-    }
-    const command = new GetObjectCommand(input);
-    const url = await getSignedUrl(s3, command, { expiresIn: 36000 });
-    res.end(url);
-});
-
-//
-//
-//
-//4:) list all objects from particular folder
-const ListAllFiles = catchAsync(async (req, res, next) => {
-    const { bucketName, folderName } = req.body;
-    const input = {
-        Bucket: bucketName,
-        Prefix: `${folderName}/`,
-    };
-    const command = new ListObjectsV2Command(input);
-    const output = await s3.send(command);
-
     res.status(200).json({
-        status: "sucess",
-        ouput: output.Contents,
+        status: "Success",
+        message: "Successfully edited Folder Title",
     });
 });
 
-//
-//
-//
-//5:) delete an object of particular bucket/folder/object-key
-const deleteFile = catchAsync(async (req, res, next) => {
-    const { bucketName, folderName, keyName } = req.body;
+//2:) Uploads multiple files to the specified folder in the corresponding bucket/course
+const uploadChapter = catchAsync(async (req, res, next) => {
+    //database work:
+    //extract all data field related to folder/folderSchema
+    let { bucketName, folderName, folderTitle, free } = req.body;
 
-    const input = {
-        Bucket: bucketName,
-        Key: `${folderName}/${keyName}`,
+    let videoTitles = [];
+    let pdfFileTitles = [];
+    let videoLinks = [];
+    let pdfLinks = [];
+    let isFree = [];
+
+    //extract and fill videotitle,videolinks,pdftitle, pdflink and isFree from req.files,
+    //It helps to keep reference of s3 object in database for future query
+    req.files.forEach((file) => {
+        if (file.mimetype == "video/mp4") {
+            //check if video is free or not
+            if (free == true) {
+                isFree.push(true);
+            } else {
+                isFree.push(false);
+            }
+            //add video titles
+            videoTitles.push(file.originalname);
+            //add video links/keys:
+            videoLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
+        } else {
+            pdfFileTitles.push(file.originalname);
+            pdfLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
+        }
+    });
+
+    const newFolder = {
+        folderName: folderName,
+        folderTitle: folderTitle,
+        videoTitles: videoTitles,
+        isFree: isFree,
+        pdfFileTitles: pdfFileTitles,
+        videoLinks: videoLinks,
+        pdfLinks: pdfLinks,
     };
-    const command = new DeleteObjectCommand(input);
-    await s3.send(command);
-    res.end("successfully deleted file");
+
+    if (!(await doesExist(bucketName, folderName))) {
+        await Course.findOneAndUpdate(
+            { bucketName: bucketName },
+            {
+                $push: { content: newFolder },
+            },
+            { new: true }
+        );
+
+        //cloud work:
+        let i = 0,
+            j = 0;
+        const inputs = req.files.map((file) => {
+            if (file.mimetype == "video/mp4") {
+                i++;
+                return returnInputAccMimetype(
+                    file,
+                    req.body,
+                    videoLinks[i - 1]
+                );
+            } else {
+                j++;
+                return returnInputAccMimetype(file, req.body, pdfLinks[j - 1]);
+            }
+        });
+
+        //upload all files
+        await Promise.all(
+            inputs.map((input) => s3.send(new PutObjectCommand(input)))
+        );
+        res.status(200).json({
+            status: "Success",
+            message: "Successfully added new Folder",
+        });
+    } else {
+        res.status(400).json({
+            status: "Failed",
+            message: "Chapter Already Exist ,please create other or update",
+        });
+    }
 });
 
-//
-//
-//
-//6:) create brand new course:
+//3:) create brand new course:
 const createNewCourse = catchAsync(async (req, res, next) => {
+    //database work:
+    //create new course in database with thumbnail reference to s3
     const { bucketName } = req.body;
-    const thumbnailKey = `${bucketName}/${Date.now()}-${req.file.originalname}`;
+    const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
 
-    // create course in mongoDB and reference thumbnail to aws s3
     await Course.create({ ...req.body, thumbnail: thumbnailKey });
 
+    //cloud work:
     // create a new course bucket
     await createBucket({ Bucket: bucketName });
 
@@ -164,51 +159,8 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     res.end("New Course Successfully created");
 });
 
-//
-//
-//
-//7:) It deletes an entire folder from a bucket
-const deleteEntireFolder = async (req, res, next) => {
-    const { bucketName, folderName } = req.body;
-
-    const input1 = {
-        Bucket: bucketName,
-        Prefix: `${folderName}/`,
-    };
-    //get an array of keys
-    const command1 = new ListObjectsV2Command(input1);
-    const keysArray = await s3.send(command1);
-    //extract all key and make array of inputs
-    const inputs = keysArray.Contents.map((keyfile) => {
-        return {
-            Key: keyfile.Key,
-        };
-    });
-    // delete all keys based on array of inputs
-    const params = {
-        Bucket: bucketName,
-        Delete: {
-            Objects: inputs,
-            Quiet: false,
-        },
-    };
-    //deletion command executed
-    const command2 = new DeleteObjectsCommand(params);
-    await s3.send(command2);
-
-    res.end("Folder deletion completed");
-};
-
-//
-//
-//
-//
 module.exports = {
     createNewCourse,
-    uploadSingleFile,
-    uploadMultipleFile,
-    getFile,
-    ListAllFiles,
-    deleteFile,
-    deleteEntireFolder,
+    editFolder,
+    uploadChapter,
 };
