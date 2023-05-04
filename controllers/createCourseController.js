@@ -148,16 +148,16 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     await Course.create({ ...req.body, thumbnail: thumbnailKey });
 
     //cloud work:
-    // create a new course bucket
-    await createBucket({ Bucket: bucketName });
+    // // create a new course bucket
+    // await createBucket({ Bucket: bucketName });
 
-    // upload thumbnail in s3
-    const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: thumbnailKey,
-        Body: req.file.buffer,
-    });
-    await s3.send(command);
+    // // upload thumbnail in s3
+    // const command = new PutObjectCommand({
+    //     Bucket: bucketName,
+    //     Key: thumbnailKey,
+    //     Body: req.file.buffer,
+    // });
+    // await s3.send(command);
     res.end("New Course Successfully created");
 });
 
