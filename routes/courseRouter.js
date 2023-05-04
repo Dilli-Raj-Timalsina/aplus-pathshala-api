@@ -14,7 +14,7 @@ const {
     getFile,
 } = require("../controllers/getCourseController");
 
-// Routes for creating courses
+// Routes for creating courses :
 router.route("/editFolder").post(editFolder);
 router.route("/uploadFolder").post(upload.array("binary", 12), uploadChapter);
 router.route("/createCourse").post(upload.single("binary"), createNewCourse);
