@@ -33,8 +33,8 @@ app.use("/api", limiter);
 
 // passport configuration:
 const passport = require("passport");
-require("./authConfig/passport-jwt");
-require("./authConfig/passport-google");
+require("./authSetupGoogle/passport-google");
+require("./authSetupGoogle/passport-jwt");
 app.use(passport.initialize());
 
 //Routes:
