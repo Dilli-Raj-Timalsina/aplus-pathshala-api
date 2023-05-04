@@ -36,6 +36,8 @@ const doesExist = async (bucketName, folderName) => {
     }));
 };
 
+//0:) Add remaining files to the folder:
+
 //1:) Edit Folder title of provided bucketName/folderName
 const editFolder = catchAsync(async (req, res, next) => {
     const { bucketName, folderName, folderTitle } = req.body;
