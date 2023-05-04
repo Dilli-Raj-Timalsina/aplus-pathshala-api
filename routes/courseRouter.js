@@ -9,9 +9,9 @@ const {
 } = require("../controllers/createCourseController");
 const { deleteEntireFolder } = require("../controllers/deleteCourseController");
 const {
+    getAllCourses,
     getCourseMetaData,
     getFile,
-    getFolderContent,
 } = require("../controllers/getCourseController");
 
 // Routes for creating courses
@@ -20,8 +20,8 @@ router.route("/uploadFolder").post(upload.array("binary", 12), uploadChapter);
 router.route("/createCourse").post(upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
-router.route("/getFile").get(getFile);
-router.route("/getFolderContent").post(getFolderContent);
+router.route("/getFile").post(getFile);
+router.route("/getAllCourses").post(getAllCourses);
 router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses

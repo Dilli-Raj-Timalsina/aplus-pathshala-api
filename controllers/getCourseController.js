@@ -26,21 +26,12 @@ const getFile = catchAsync(async (req, res, next) => {
     }
     const command = new GetObjectCommand(input);
     const url = await getSignedUrl(s3, command, { expiresIn: 36000 });
-    res.end(url);
-});
-
-//2:) list all objects from particular folder
-const getFolderContent = catchAsync(async (req, res, next) => {
-    const { bucketName } = req.body;
-    const doc = await Course.findOne({
-        bucketName: bucketName,
-    }).select("content");
-
     res.status(200).json({
         status: "sucess",
-        ouput: doc,
+        ouput: url,
     });
 });
+
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
     const { bucketName } = req.body;
@@ -54,8 +45,18 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
     });
 });
 
+//3:) get all the  courses
+const getAllCourses = catchAsync(async (req, res, next) => {
+    //return all course accoding to pagination:
+
+    res.status(200).json({
+        status: "sucess",
+        ouput: "doc",
+    });
+});
+
 module.exports = {
     getCourseMetaData,
-    getFolderContent,
+    getAllCourses,
     getFile,
 };
