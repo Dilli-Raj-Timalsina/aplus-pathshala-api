@@ -8,15 +8,16 @@ let opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.SECRET;
 passport.use(
-  new JwtStrategy(opts, function (jwt_payload, done) {
-    User.findOne({
-      email: jwt_payload.id.email,
+    new JwtStrategy(opts, function (jwt_payload, done) {
+        User.findOne({
+            email: jwt_payload.id.email,
+        })
+            .then((user) => {
+                return done(null, user);
+            })
+            .catch((err) => {
+                return done(err, false);
+            });
     })
-      .then((user) => {
-        return done(null, user);
-      })
-      .catch((err) => {
-        return done(err, false);
-      });
-  })
 );
+//
