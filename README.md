@@ -26,4 +26,17 @@ Types of contribution you can do:
 3 : project idea direction
 4 : feature idea and issue creation 
 
+#Documentation:
+Sure, here is the API documentation for the /api/v1/student/signup and /api/v1/student/login endpoints:
+
+Signup
+This endpoint allows a student to sign up by providing their name, email, and password. The API returns a JWT in a cookie that can be used to authenticate the student in subsequent requests.
+
+Endpoint	Request Method	Request Body	Response Body
+/api/v1/student/signup	POST	{ "name": "John Doe", "email": "johndoe@example.com", "password": "password123" }	If successful: { "status": "success", "message": "User created successfully" }. Otherwise: { "status": "error", "message": <error-message> }
+Request Body Requirements
+name: The name of the student (required)
+email: The email address of the student (required)
+password: The password for the student account (required)
+
 
