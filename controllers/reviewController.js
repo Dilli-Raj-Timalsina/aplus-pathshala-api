@@ -3,7 +3,6 @@ const Review = require("./../models/reviewSchema");
 const AppError = require("./../errors/appError");
 const catchAsync = require("./../errors/catchAsync");
 const writeReview = catchAsync(async (req, res, next) => {
-    throw new AppError("This is wrong bro");
     const { bucketName } = req.body;
     const review = {
         rating: "5",
