@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
+const { reviewSchema } = require("./reviewSchema");
+
 //Define the child schema
 const folderSchema = new Schema({
     folderName: String,
@@ -82,9 +84,9 @@ const courseSchema = new Schema({
         required: false,
     },
     content: [folderSchema],
+    review: [reviewSchema],
     teacher: [{ type: Schema.Types.ObjectId, ref: "Teacher", required: false }],
     student: [{ type: Schema.Types.ObjectId, ref: "Student", required: false }],
-    review: [{ type: Schema.Types.ObjectId, ref: "Review", required: false }],
 });
 
 const Course = mongoose.model("Course", courseSchema);
