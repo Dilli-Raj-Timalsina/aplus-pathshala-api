@@ -44,6 +44,11 @@ const teacherRouter = require("./routes/teacherRouter");
 const courseRouter = require("./routes/courseRouter");
 
 app.use(googleAuthRouter);
+app.route("/", (req, res) => {
+    res.end(
+        "Thanks for visiting , checkout API documentation and start implementing signup "
+    );
+});
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/teacher", teacherRouter);
 app.use("/api/v1/course", courseRouter);
