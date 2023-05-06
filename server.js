@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 const app = require("./app");
 const cors = require("cors");
 
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+    })
+);
 //setting dotenv file in our server
 require("dotenv").config({ path: __dirname + "/.env" });
 const port = process.env.PORT || 3000;
