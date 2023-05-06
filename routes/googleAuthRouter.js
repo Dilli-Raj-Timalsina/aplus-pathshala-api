@@ -17,7 +17,18 @@ router.get(
         session: false,
     }),
     async (req, res) => {
+        //generating token and sentting it in cookie
         const token = await signToken(req.user.email);
+        const cookieOptions = {
+            expires: new Date(
+                Date.now() +
+                    process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+            ),
+            httpOnly: true,
+        };
+        if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+        res.cookie("jwt", token, cookieOptions);
+
         res.status(200).json({
             status: "success",
             token: "Bearer " + token,
