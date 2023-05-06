@@ -15,7 +15,7 @@ try {
 when we run "node server.js" it imports app.js i.e object of module.exports,
 and creates app{} object from express() method and starts server by listening
 to the port 3000/PORT , by below code .
-*/
+*/ //
 
 app.listen(process.env["PORT"], () => {
     console.log(`App is running on port ${process.env.PORT}`);
