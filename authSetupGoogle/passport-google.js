@@ -10,30 +10,40 @@ passport.use(
             clientID: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             callbackURL:
-                "https://a-pathshala-service-2.onrender.com/auth/google/redirect",
+                "https://a-pathshala-service-2.onrender.com/auth/google/redirect", //hosted uri:
+            // callbackURL: "http://127.0.0.1:3000/auth/google/redirect", //localhost uri
+            userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+            scope: [
+                "profile",
+                "email",
+                "openid",
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/user.phonenumbers.read",
+            ],
         },
         (accessToken, refreshToken, profile, done) => {
             // check if user already exists in our own db
             User.findOne({
-                google_id: (profile.id = 100),
                 email: profile.emails[0].value,
             }).then((currentUser) => {
                 if (currentUser) {
                     // already have this user
                     done(null, currentUser);
                 } else {
-                    // if not, create user in our db
-                    new User({
-                        google_id: profile.id,
+                    // Extract the user's information from the profile object
+                    const user = {
                         name: profile.displayName,
                         email: profile.emails[0].value,
-                        passport: "google",
-                        passport_confirm: "google",
-                    })
-                        .save()
-                        .then((newUser) => {
-                            done(null, newUser);
-                        });
+                        profilePicture: profile.photos[0].value,
+                        contact: profile.phoneNumbers
+                            ? profile.phoneNumbers[0].value
+                            : null,
+                    };
+                    // if not, create user in our db
+                    new User(user).save().then((newUser) => {
+                        done(null, newUser);
+                    });
                 }
             });
         }
