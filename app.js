@@ -10,9 +10,6 @@ app.use(cors());
 //   origin: 'https://www.a+pathshala.com'
 // }))
 
-// app.options("*", cors());
-// app.options('/api/v1/tours/:id', cors());
-
 //global error handler config:
 const AppError = require("./errors/appError");
 const globalErrorHandler = require("./errors/errorController");
@@ -60,17 +57,17 @@ app.use(googleAuthRouter);
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/teacher", teacherRouter);
 app.use("/api/v1/course", courseRouter);
+
 app.use("/", (req, res) => {
     res.status(200).json({
         status: "success",
         message:
-            "Thanks for visiting , checkout API documentation and start implementing signup ",
+            "This is our Base url , yet not implemented you should better test other routes",
     });
 });
 
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {
-    // console.log("hello");
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 

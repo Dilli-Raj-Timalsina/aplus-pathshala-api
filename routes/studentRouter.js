@@ -19,6 +19,6 @@ router.route("/logout").get(logoutControl);
 router.route("/protected").post(protect, protectedControl);
 
 //commenting and reviewing:
-router.route("/comment").post(writeReview);
+router.route("/comment").post(protect, writeReview);
 
 module.exports = router;
