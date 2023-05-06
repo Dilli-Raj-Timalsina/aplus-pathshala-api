@@ -5,7 +5,7 @@ const {
     forgetControl,
     resetControl,
     logoutControl,
-    fakeControl,
+    protectedControl,
     protect,
 } = require("../controllers/studentAuthController");
 const { writeReview } = require("../controllers/reviewController");
@@ -16,7 +16,7 @@ router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/resetPassword").post(resetControl);
 router.route("/logout").get(logoutControl);
-router.route("/fake").post(protect, fakeControl);
+router.route("/protected").post(protect, protectedControl);
 
 //commenting and reviewing:
 router.route("/comment").post(writeReview);

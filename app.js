@@ -1,8 +1,18 @@
 const express = require("express");
 const app = express();
-
 const cors = require("cors");
+
+// Implement CORS
 app.use(cors());
+// Access-Control-Allow-Origin *
+// a+pathshala.com, front-end natours.com
+// app.use(cors({
+//   origin: 'https://www.a+pathshala.com'
+// }))
+
+// app.options("*", cors());
+// app.options('/api/v1/tours/:id', cors());
+
 //global error handler config:
 const AppError = require("./errors/appError");
 const globalErrorHandler = require("./errors/errorController");
