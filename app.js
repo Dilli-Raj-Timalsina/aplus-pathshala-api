@@ -44,7 +44,7 @@ const teacherRouter = require("./routes/teacherRouter");
 const courseRouter = require("./routes/courseRouter");
 
 app.use(googleAuthRouter);
-app.route("/", (req, res) => {
+app.use("/", (req, res) => {
     res.end(
         "Thanks for visiting , checkout API documentation and start implementing signup "
     );
