@@ -44,14 +44,17 @@ const teacherRouter = require("./routes/teacherRouter");
 const courseRouter = require("./routes/courseRouter");
 
 app.use(googleAuthRouter);
-app.use("/", (req, res) => {
-    res.end(
-        "Thanks for visiting , checkout API documentation and start implementing signup "
-    );
-});
+
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/teacher", teacherRouter);
 app.use("/api/v1/course", courseRouter);
+app.use("/", (req, res) => {
+    res.status(200).json({
+        status: "success",
+        message:
+            "Thanks for visiting , checkout API documentation and start implementing signup ",
+    });
+});
 
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {
