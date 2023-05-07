@@ -13,10 +13,12 @@ router.get(
 router.get(
     "/auth/google/redirect",
     passport.authenticate("google", {
+        successRedirect: "http://127.0.0.1:3000/",
         failureRedirect: "/api/v1/student/signup",
         session: false,
     }),
     async (req, res) => {
+        console.log("hi");
         //generating token and setting it in cookie
         const token = await signToken(req.user.email);
         const cookieOptions = {

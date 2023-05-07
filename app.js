@@ -3,7 +3,13 @@ const app = express();
 const cors = require("cors");
 
 // Implement CORS
-app.use(cors());
+// app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+    })
+);
 // Access-Control-Allow-Origin *
 // a+pathshala.com, front-end natours.com
 // app.use(cors({
