@@ -11,16 +11,17 @@ router.get(
 );
 
 router.get(
-    "/auth/google/redirect",
+    "/auth/google/callback",
     passport.authenticate("google", {
-        successRedirect: "http://127.0.0.1:3000/",
-        failureRedirect: "/api/v1/student/signup",
+        failureRedirect: "http://127.0.0.1:3000/failed",
         session: false,
     }),
     async (req, res) => {
-        console.log("hi");
         //generating token and setting it in cookie
-        const token = await signToken(req.user.email);
+        const token = await signToken({
+            email: req.user.email,
+            _id: req.user._id,
+        });
         const cookieOptions = {
             expires: new Date(
                 Date.now() +
@@ -29,16 +30,18 @@ router.get(
             httpOnly: true,
         };
         if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+        //setting cookie
         res.cookie("jwt", token, cookieOptions);
-
-        res.status(200).json({
-            status: "success",
+        //setting profile information
+        res.user = {
             token: "Bearer " + token,
             name: req.user.name,
             email: req.user.email,
             profilePicture: req.user.profilePicture,
             contactNumber: req.user.contact,
-        });
+        };
+        //redirecting it to homepage
+        res.redirect("http://127.0.0.1:3000/");
     }
 );
 

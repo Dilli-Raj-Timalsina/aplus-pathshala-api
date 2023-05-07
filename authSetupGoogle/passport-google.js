@@ -11,16 +11,9 @@ passport.use(
             clientSecret: process.env.CLIENT_SECRET,
             callbackURL:
                 "https://a-pathshala-service-2.onrender.com/auth/google/redirect", //hosted uri:
-            // callbackURL: "http://127.0.0.1:3000/auth/google/redirect", //localhost uri
+            // callbackURL: "http://127.0.0.1:3000/auth/google/callback", //localhost uri
             userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
-            scope: [
-                "profile",
-                "email",
-                "openid",
-                "https://www.googleapis.com/auth/userinfo.profile",
-                "https://www.googleapis.com/auth/userinfo.email",
-                "https://www.googleapis.com/auth/user.phonenumbers.read",
-            ],
+            scope: ["profile"],
         },
         (accessToken, refreshToken, profile, done) => {
             // check if user already exists in our own db
