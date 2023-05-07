@@ -14,6 +14,10 @@ app.use(cors());
 const AppError = require("./errors/appError");
 const globalErrorHandler = require("./errors/errorController");
 
+//cookie-parser
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 //making req.body available:
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());

@@ -17,7 +17,7 @@ router.get(
         session: false,
     }),
     async (req, res) => {
-        //generating token and sentting it in cookie
+        //generating token and setting it in cookie
         const token = await signToken(req.user.email);
         const cookieOptions = {
             expires: new Date(
