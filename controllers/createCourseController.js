@@ -143,7 +143,7 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     //database work:
     //create new course in database with thumbnail reference to s3
     const { bucketName } = req.body;
-    console.log(req.file, req.files);
+    console.log(req.body, req.file, req.files);
     const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
 
     await Course.create({ ...req.body, thumbnail: thumbnailKey });
@@ -153,12 +153,12 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     await createBucket({ Bucket: bucketName });
 
     // upload thumbnail in s3
-    const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: thumbnailKey,
-        Body: req.file.buffer,
-    });
-    await s3.send(command);
+    // const command = new PutObjectCommand({
+    //     Bucket: bucketName,
+    //     Key: thumbnailKey,
+    //     Body: req.file.buffer,
+    // });
+    // await s3.send(command);
     res.end("New Course Successfully created");
 });
 
