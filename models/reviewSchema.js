@@ -2,16 +2,11 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const reviewSchema = new Schema({
-    course: {
-        type: Schema.Types.ObjectId,
-        ref: "Course",
-        required: true,
-    },
-    student: {
-        type: Schema.Types.ObjectId,
-        ref: "Student",
-        required: true,
-    },
+    // student: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Student",
+    //     required: true,
+    // },
     rating: {
         type: Number,
         required: true,

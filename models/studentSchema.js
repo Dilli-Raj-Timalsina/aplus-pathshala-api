@@ -43,10 +43,9 @@ const studentSchema = new Schema({
         required: false,
         type: Number,
     },
-    google_id: {
-        type: Number,
+    profilePicture: {
         required: false,
-        default: 100,
+        type: String,
     },
     resetToken: {
         type: tokenSchema,

@@ -1,9 +1,28 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+
+// Implement CORS
+// app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+    })
+);
+// Access-Control-Allow-Origin *
+// a+pathshala.com, front-end natours.com
+// app.use(cors({
+//   origin: 'https://www.a+pathshala.com'
+// }))
 
 //global error handler config:
 const AppError = require("./errors/appError");
 const globalErrorHandler = require("./errors/errorController");
+
+//cookie-parser
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 //making req.body available:
 const bodyParser = require("body-parser");
@@ -44,13 +63,21 @@ const teacherRouter = require("./routes/teacherRouter");
 const courseRouter = require("./routes/courseRouter");
 
 app.use(googleAuthRouter);
+
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/teacher", teacherRouter);
 app.use("/api/v1/course", courseRouter);
 
+app.use("/", (req, res) => {
+    res.status(200).json({
+        status: "success",
+        message:
+            "This is our Base url , yet not implemented you should better test other routes",
+    });
+});
+
 //handeling global unhandled error and rejection ,e.g if no route is defined for certain url
 app.all("*", (req, res, next) => {
-    // console.log("hello");
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
