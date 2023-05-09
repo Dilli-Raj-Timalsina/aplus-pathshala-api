@@ -23,6 +23,6 @@ router.route("/protected").post(protect, protectedControl);
 router.route("/profile").get(protect, profileControl);
 
 //commenting and reviewing:
-router.route("/comment").post(protect, writeReview);
+router.route("/comment").post(writeReview);
 
 module.exports = router;
