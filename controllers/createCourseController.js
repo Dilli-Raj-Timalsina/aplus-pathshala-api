@@ -59,6 +59,8 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     //database work:
     //extract all data field related to folder/folderSchema
     let { bucketName, folderName, folderTitle, free } = req.body;
+    console.log(req.files);
+    console.log(req.file);
 
     let videoTitles = [];
     let pdfFileTitles = [];
