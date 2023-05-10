@@ -60,6 +60,8 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     //extract all data field related to folder/folderSchema
     let { bucketName, folderName, folderTitle, free } = req.body;
     console.log(req.files);
+    console.log(req.body);
+    console.log(req.file);
     req.files.forEach((file) => {
         console.log(file);
     });
