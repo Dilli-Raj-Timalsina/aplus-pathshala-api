@@ -160,6 +160,7 @@ const createNewCourse = catchAsync(async (req, res, next) => {
         Body: req.file.buffer,
     });
     await s3.send(command);
+  
     res.status(200).json({
         status: "success",
         doc,
