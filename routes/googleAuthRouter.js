@@ -41,7 +41,7 @@ router.get(
             contactNumber: req.user.contact,
         };
         //redirecting it to homepage
-        res.status(200).json(req.user);
+        res.redirect("https://a-pathshala-service-1.vercel.app/");
     }
 );
 
