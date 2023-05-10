@@ -4,9 +4,13 @@ const cors = require("cors");
 
 // Implement CORS
 // app.use(cors());
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://a-pathshala-service-1.vercel.app/",
+];
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: allowedOrigins,
         credentials: true,
     })
 );

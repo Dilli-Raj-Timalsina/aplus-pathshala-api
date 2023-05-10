@@ -35,10 +35,20 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
+    const { _id, name, email, course, profilePicture, contact } = user;
+    const userProfile = {
+        _id,
+        name,
+        email,
+        course,
+        profilePicture,
+        contact,
+    };
 
     res.status(statusCode).json({
         status: "success",
         token: "Bearer " + token,
+        userProfile,
     });
 };
 
@@ -85,6 +95,11 @@ const protect = catchAsync(async (req, res, next) => {
 
 //3:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
+    //check whether user already exist or not/ duplicate email
+    if (await User.findOne({ email: req.body.email })) {
+        throw new AppError("User Already Exist with this Email", 409);
+    }
+
     const user = await User.create({
         ...req.body,
     });
@@ -102,7 +117,7 @@ const loginControl = catchAsync(async (req, res) => {
         throw new AppError("email or password not provided", 403);
     }
     // b) Check if user exists && password is correct
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email });
 
     if (!user || !(await user.correctPassword(password, user.password))) {
         throw new AppError("Incorrect email or password", 401);
