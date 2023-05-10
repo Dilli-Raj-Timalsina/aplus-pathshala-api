@@ -10,7 +10,7 @@ passport.use(
             clientID: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             callbackURL:
-                "https://a-pathshala-service-2.onrender.com/auth/google/redirect", //hosted uri:
+                "https://a-pathshala-service-2.onrender.com/auth/google/callback", //hosted uri:
             // callbackURL: "http://127.0.0.1:3000/auth/google/callback", //localhost uri
             userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
             scope: ["profile"],
