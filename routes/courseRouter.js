@@ -17,13 +17,7 @@ const {
 // Routes for creating courses :
 router.route("/editFolder").post(editFolder);
 router.route("/uploadFolder").post(upload.array("binary", 12), uploadChapter);
-router
-    .route("/createCourse")
-    .post(upload.single("binary"), async (req, res, next) => {
-        console.log(req.file);
-        console.log(req.files);
-        console.log(req.body);
-    });
+router.route("/createCourse").post(upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
 router.route("/getFile").post(getFile);
