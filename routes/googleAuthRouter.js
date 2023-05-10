@@ -41,7 +41,7 @@ router.get(
             contactNumber: req.user.contact,
         };
         //redirecting it to homepage
-        res.redirect("http://127.0.0.1:3000/");
+        res.status(200).json(req.user);
     }
 );
 
