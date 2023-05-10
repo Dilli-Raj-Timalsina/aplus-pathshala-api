@@ -1,42 +1,59 @@
+# Backend part of A+ Pathshala :
 
-# Backend part of A+ pathshala :
+<ul>
+    <li>Create a website and mobile application for XYZ Educational Institute with common backend.</li>
+    <li>The fundamental idea is to leverage offline institutes to online.</li>
+    <li>The Core services of the website will be:</li>
+    <ol type="i">
+        <li>live classes</li> 
+        <li>students and teachers authentication and authorization</li>
+        <li>online payment system</li> 
+        <li>recorded course management</li> 
+        <li>online quiz and exam</li>
+    </ol>
+    <li>website/application should be able to manage 1000 concurrent users.</li> 
+</ul>
 
-Create a common website and mobile application for xyz coaching/college institute .
-The fundamental idea is to leverage offline institute to online .
-The core  services of the website are:
-i) live class,
-         ii) student and teacher’s authentication and authorization,
-         iii)online payment system,
-         iv)recorded course management,
-         v)online quiz and exam,
-website/application should be able to manage 1000 concurrent user,
+## Contributing Guidelines :
 
-## Contributing
+**Contributors are always welcome!**
 
-Contributions are always welcome!
+Here are the ways you can contribute :
 
-Mail on dillirajtimalsina354@gmail.com / directly DM on https://www.linkedin.com/in/dilli-raj-timalsina/ for Contributing guide or directly open a PR .
-You can create and solve issues .
+<ol type="i">
+    <li>Code contribution</li>
+    <li>Project idea direction</li>
+    <li>Documentation contribution</li>
+    <li>Feature ideas & issue creation</li>
+    <li>Create and solve own issues</li>
+</ol>
 
-we will add few best contributors in our internal team  as well .
+**We will add the best contributors in our internal team as well !**
 
-Types of contribution you can do:
-1 : Documentation contribution
-2 : code contribution 
-3 : project idea direction
-4 : feature idea and issue creation 
+For any guidance, mail to dillirajtimalsina354@gmail.com or get connected on [LinkedIn](https://www.linkedin.com/in/dilli-raj-timalsina) or you may directly open a Pull Request.
 
-#Documentation:
-Sure, here is the API documentation for the /api/v1/student/signup and /api/v1/student/login endpoints:
+<hr>
 
-Signup
-This endpoint allows a student to sign up by providing their name, email, and password. The API returns a JWT in a cookie that can be used to authenticate the student in subsequent requests.
+Here is the API documentation for the /api/v1/student/signup and /api/v1/student/login endpoints :
 
-Endpoint	Request Method	Request Body	Response Body
-/api/v1/student/signup	POST	{ "name": "John Doe", "email": "johndoe@example.com", "password": "password123" }	If successful: { "status": "success", "message": "User created successfully" }. Otherwise: { "status": "error", "message": <error-message> }
-Request Body Requirements
-name: The name of the student (required)
-email: The email address of the student (required)
-password: The password for the student account (required)
+### Signup :
 
+This endpoint allows a student to sign up by providing their name, email, and password.
+The API returns a JWT in a cookie that can be used to authenticate the student in subsequent requests.
 
+#### Request Body Requirements :
+
+- name: The name of the student (required)
+- email: The email address of the student (required)
+- password: The password for the student account (required)
+
+### Endpoint Request Method for /api/v1/student/signup :
+
+#### Request Body :
+
+`POST { "name": "John Doe", "email": "johndoe@example.com", "password": "password123" }`
+
+#### Response Body :
+
+If successful: `{ "status": "success", "message": "User created successfully" }`<br>
+Otherwise: `{ "status": "error", "message": <error-message> }`
