@@ -60,84 +60,86 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     //extract all data field related to folder/folderSchema
     let { bucketName, folderName, folderTitle, free } = req.body;
     console.log(req.files);
-    console.log(req.file);
-
-    let videoTitles = [];
-    let pdfFileTitles = [];
-    let videoLinks = [];
-    let pdfLinks = [];
-    let isFree = [];
-
-    //extract and fill videotitle,videolinks,pdftitle, pdflink and isFree from req.files,
-    //It helps to keep reference of s3 object in database for future query
     req.files.forEach((file) => {
-        if (file.mimetype == "video/mp4") {
-            //check if video is free or not
-            if (free == true) {
-                isFree.push(true);
-            } else {
-                isFree.push(false);
-            }
-            //add video titles
-            videoTitles.push(file.originalname);
-            //add video links/keys:
-            videoLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
-        } else {
-            pdfFileTitles.push(file.originalname);
-            pdfLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
-        }
+        console.log(file);
     });
 
-    const newFolder = {
-        folderName: folderName,
-        folderTitle: folderTitle,
-        videoTitles: videoTitles,
-        isFree: isFree,
-        pdfFileTitles: pdfFileTitles,
-        videoLinks: videoLinks,
-        pdfLinks: pdfLinks,
-    };
+    //     let videoTitles = [];
+    //     let pdfFileTitles = [];
+    //     let videoLinks = [];
+    //     let pdfLinks = [];
+    //     let isFree = [];
 
-    if (!(await doesExist(bucketName, folderName))) {
-        await Course.findOneAndUpdate(
-            { bucketName: bucketName },
-            {
-                $push: { content: newFolder },
-            },
-            { new: true }
-        );
+    //     //extract and fill videotitle,videolinks,pdftitle, pdflink and isFree from req.files,
+    //     //It helps to keep reference of s3 object in database for future query
+    //     req.files.forEach((file) => {
+    //         if (file.mimetype == "video/mp4") {
+    //             //check if video is free or not
+    //             if (free == true) {
+    //                 isFree.push(true);
+    //             } else {
+    //                 isFree.push(false);
+    //             }
+    //             //add video titles
+    //             videoTitles.push(file.originalname);
+    //             //add video links/keys:
+    //             videoLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
+    //         } else {
+    //             pdfFileTitles.push(file.originalname);
+    //             pdfLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
+    //         }
+    //     });
 
-        //cloud work:
-        let i = 0,
-            j = 0;
-        const inputs = req.files.map((file) => {
-            if (file.mimetype == "video/mp4") {
-                i++;
-                return returnInputAccMimetype(
-                    file,
-                    req.body,
-                    videoLinks[i - 1]
-                );
-            } else {
-                j++;
-                return returnInputAccMimetype(file, req.body, pdfLinks[j - 1]);
-            }
-        });
+    //     const newFolder = {
+    //         folderName: folderName,
+    //         folderTitle: folderTitle,
+    //         videoTitles: videoTitles,
+    //         isFree: isFree,
+    //         pdfFileTitles: pdfFileTitles,
+    //         videoLinks: videoLinks,
+    //         pdfLinks: pdfLinks,
+    //     };
 
-        //upload all files
-        await Promise.all(
-            inputs.map((input) => s3.send(new PutObjectCommand(input)))
-        );
-        res.status(200).json({
-            status: "Success",
-            message: "Successfully added new Folder",
-        });
-    } else {
-        res.status(400).json({
-            status: "Failed",
-            message: "Chapter Already Exist ,please create other or update",
-        });
-    }
+    //     if (!(await doesExist(bucketName, folderName))) {
+    //         await Course.findOneAndUpdate(
+    //             { bucketName: bucketName },
+    //             {
+    //                 $push: { content: newFolder },
+    //             },
+    //             { new: true }
+    //         );
+
+    //         //cloud work:
+    //         let i = 0,
+    //             j = 0;
+    //         const inputs = req.files.map((file) => {
+    //             if (file.mimetype == "video/mp4") {
+    //                 i++;
+    //                 return returnInputAccMimetype(
+    //                     file,
+    //                     req.body,
+    //                     videoLinks[i - 1]
+    //                 );
+    //             } else {
+    //                 j++;
+    //                 return returnInputAccMimetype(file, req.body, pdfLinks[j - 1]);
+    //             }
+    //         });
+
+    //         //upload all files
+    //         await Promise.all(
+    //             inputs.map((input) => s3.send(new PutObjectCommand(input)))
+    //         );
+    //         res.status(200).json({
+    //             status: "Success",
+    //             message: "Successfully added new Folder",
+    //         });
+    //     } else {
+    //         res.status(400).json({
+    //             status: "Failed",
+    //             message: "Chapter Already Exist ,please create other or update",
+    //         });
+    //     }
 });
 
 //3:) create brand new course:
