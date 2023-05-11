@@ -26,9 +26,9 @@ router
     .post(protect, upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
-router.route("/getFile").post(getFile);
-router.route("/getAllCourses").get(getAllCourses);
-router.route("/getCourseMetaData").post(getCourseMetaData);
+router.route("/getFile").post(protect, getFile);
+router.route("/getAllCourses").get(protect, getAllCourses);
+router.route("/getCourseMetaData").post(protect, getCourseMetaData);
 
 // Routes for deleting courses
 router.route("/deleteFolder").post(deleteEntireFolder);
