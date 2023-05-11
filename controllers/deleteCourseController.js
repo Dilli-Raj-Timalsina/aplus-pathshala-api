@@ -58,6 +58,10 @@ const deleteEntireFolder = async (req, res, next) => {
     });
 };
 
+const deleteAllCourses = async (req, res, next) => {
+    res.end("all deleted on aws");
+};
+
 module.exports = {
     deleteEntireFolder,
 };
