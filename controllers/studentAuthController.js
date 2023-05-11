@@ -57,12 +57,14 @@ const createSendToken = async (user, statusCode, res) => {
 const protect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
+    console.log(req.headers.authorization);
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
     ) {
         token = req.headers.authorization.split(" ")[1];
     } else if (req.cookies.jwt) {
+        console.log(req.cookie.jwt);
         token = req.cookies.jwt;
     }
 
