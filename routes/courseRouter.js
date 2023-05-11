@@ -16,12 +16,12 @@ const {
 
 // Routes for creating courses :
 router.route("/editFolder").post(editFolder);
-router.route("/uploadFolder").post(upload.array("binary", 12), uploadChapter);
+router.route("/uploadFolder").post(upload.array("binary", 15), uploadChapter);
 router.route("/createCourse").post(upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
 router.route("/getFile").post(getFile);
-router.route("/getAllCourses").post(getAllCourses);
+router.route("/getAllCourses").get(getAllCourses);
 router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses
