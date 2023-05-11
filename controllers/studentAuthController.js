@@ -58,7 +58,7 @@ const protect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
     console.log(req.headers.authorization + "req.headers.authorization");
-    console.log(req.cookie.jwt + "req.cookie.jwt");
+    console.log(req.cookie + "req.cookie.jwt");
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
