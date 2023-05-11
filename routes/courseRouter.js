@@ -13,11 +13,17 @@ const {
     getCourseMetaData,
     getFile,
 } = require("../controllers/getCourseController");
+const deleteCourseDB = require("./../utils/deleteCourseDB");
+const { protect } = require("../controllers/studentAuthController");
 
 // Routes for creating courses :
-router.route("/editFolder").post(editFolder);
-router.route("/uploadFolder").post(upload.array("binary", 15), uploadChapter);
-router.route("/createCourse").post(upload.single("binary"), createNewCourse);
+router.route("/editFolder").post(protect, editFolder);
+router
+    .route("/uploadFolder")
+    .post(protect, upload.array("binary", 15), uploadChapter);
+router
+    .route("/createCourse")
+    .post(protect, upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
 router.route("/getFile").post(getFile);
@@ -26,5 +32,6 @@ router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses
 router.route("/deleteFolder").post(deleteEntireFolder);
+router.route("/deleteCourse").get(deleteCourseDB);
 
 module.exports = router;
