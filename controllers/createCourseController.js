@@ -154,7 +154,12 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     }-course`;
     const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
 
-    const doc = await Course.create({ ...req.body, thumbnail: thumbnailKey });
+    const doc = await Course.create({
+        ...req.body,
+        bucketName: bucketName,
+        thumbnail: thumbnailKey,
+    });
+
     // cloud work:
     // create a new course bucket
     await createBucket({ Bucket: bucketName });
