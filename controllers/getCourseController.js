@@ -38,20 +38,26 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
     const doc = await Course.findOne({
         bucketName: bucketName,
     });
+    if (!doc) {
+        throw new AppError(
+            "cannot find such course ,please try correct bucketName",
+            404
+        );
+    }
 
     res.status(200).json({
         status: "sucess",
-        ouput: doc,
+        doc,
     });
 });
 
 //3:) get all the  courses
 const getAllCourses = catchAsync(async (req, res, next) => {
     //return all course accoding to pagination:
-
+    const courses = await Course.find({});
     res.status(200).json({
         status: "sucess",
-        ouput: "doc",
+        courses,
     });
 });
 

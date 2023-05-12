@@ -7,7 +7,7 @@ const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { createBucket } = require("../awsConfig/bucketControl");
 
 const returnInputAccMimetype = (file, body, key) => {
-    const { bucketName, folderName } = body;
+    const { bucketName } = body;
     const { mimetype } = file;
 
     if (mimetype == "video/mp4") {
@@ -59,6 +59,13 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     //database work:
     //extract all data field related to folder/folderSchema
     let { bucketName, folderName, folderTitle, free } = req.body;
+    console.log("-----------------------------------------------------");
+    console.log(req.files);
+    console.log("req.files above");
+    console.log(req.body);
+    console.log("req.body above");
+    console.log(req.file);
+    console.log("req.file above");
 
     let videoTitles = [];
     let pdfFileTitles = [];
@@ -131,10 +138,10 @@ const uploadChapter = catchAsync(async (req, res, next) => {
             message: "Successfully added new Folder",
         });
     } else {
-        res.status(400).json({
-            status: "Failed",
-            message: "Chapter Already Exist ,please create other or update",
-        });
+        throw new AppError(
+            "Chapter Already Exist, please create another or editFolder",
+            407
+        );
     }
 });
 
@@ -142,12 +149,16 @@ const uploadChapter = catchAsync(async (req, res, next) => {
 const createNewCourse = catchAsync(async (req, res, next) => {
     //database work:
     //create new course in database with thumbnail reference to s3
-    const { bucketName } = req.body;
-    console.log(req.file);
+    const bucketName = `${Date.now()}-${
+        Math.floor(Math.random() * 500) + 1
+    }-course`;
     const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
 
-    const doc = await Course.create({ ...req.body, thumbnail: thumbnailKey });
-    console.log(doc);
+    const doc = await Course.create({
+        ...req.body,
+        bucketName: bucketName,
+        thumbnail: thumbnailKey,
+    });
 
     // cloud work:
     // create a new course bucket
@@ -160,10 +171,11 @@ const createNewCourse = catchAsync(async (req, res, next) => {
         Body: req.file.buffer,
     });
     await s3.send(command);
-  
+
     res.status(200).json({
         status: "success",
-        doc,
+        bucketName: doc.bucketName,
+        _id: doc._id,
     });
 });
 

@@ -35,10 +35,20 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
+    const { _id, name, email, course, profilePicture, contact } = user;
+    const userProfile = {
+        _id,
+        name,
+        email,
+        course,
+        profilePicture,
+        contact,
+    };
 
     res.status(statusCode).json({
         status: "success",
         token: "Bearer " + token,
+        userProfile,
     });
 };
 
@@ -47,6 +57,8 @@ const createSendToken = async (user, statusCode, res) => {
 const protect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
+    console.log(req.headers.authorization + "req.headers.authorization");
+    console.log(req.cookie + "req.cookie.jwt");
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
@@ -85,6 +97,11 @@ const protect = catchAsync(async (req, res, next) => {
 
 //3:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
+    //check whether user already exist or not/ duplicate email
+    if (await User.findOne({ email: req.body.email })) {
+        throw new AppError("User Already Exist with this Email", 409);
+    }
+
     const user = await User.create({
         ...req.body,
     });
@@ -102,7 +119,7 @@ const loginControl = catchAsync(async (req, res) => {
         throw new AppError("email or password not provided", 403);
     }
     // b) Check if user exists && password is correct
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email });
 
     if (!user || !(await user.correctPassword(password, user.password))) {
         throw new AppError("Incorrect email or password", 401);
@@ -176,16 +193,11 @@ const resetControl = catchAsync(async (req, res) => {
 
 //7:) logout user by putting jwt ==null in user's browser cookie
 const logoutControl = catchAsync(async (req, res, next) => {
-    const cookieOptions = {
-        expires: new Date(
-            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-        ),
+    res.cookie("jwt", "loggedout", {
+        expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,
-    };
-    if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
-
-    res.cookie("jwt", null, cookieOptions);
-    res.end("logged out");
+    });
+    res.status(200).json({ status: "success" });
 });
 
 //just for testing purpose

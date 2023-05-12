@@ -27,18 +27,6 @@ const studentSchema = new Schema({
         unique: false,
         required: false,
     },
-    passwordConfirm: {
-        type: String,
-        unique: false,
-        required: false,
-        validate: {
-            // This only works on CREATE and SAVE!!!
-            validator: function (value) {
-                return value === this.password;
-            },
-            message: "Passwords are not the same!",
-        },
-    },
     contact: {
         required: false,
         type: Number,
@@ -60,8 +48,6 @@ studentSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     // Hash the password with cost of 12
     this.password = await bcrypt.hash(this.password, 10);
-    // Delete passwordConfirm field
-    this.passwordConfirm = undefined;
     next();
 });
 //Instance Methods starts over here:

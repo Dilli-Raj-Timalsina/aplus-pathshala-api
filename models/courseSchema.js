@@ -62,7 +62,16 @@ const courseSchema = new Schema({
         trim: true,
         maxlength: 5000,
     },
-
+    category: {
+        type: String,
+        required: true,
+        maxlength: 20,
+    },
+    subCategories: {
+        type: String,
+        required: true,
+        maxlength: 20,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
