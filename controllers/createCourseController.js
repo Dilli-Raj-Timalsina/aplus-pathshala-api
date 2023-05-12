@@ -7,7 +7,7 @@ const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { createBucket } = require("../awsConfig/bucketControl");
 
 const returnInputAccMimetype = (file, body, key) => {
-    const { bucketName, folderName } = body;
+    const { bucketName } = body;
     const { mimetype } = file;
 
     if (mimetype == "video/mp4") {

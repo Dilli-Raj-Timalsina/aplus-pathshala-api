@@ -13,7 +13,6 @@ const {
     getCourseMetaData,
     getFile,
 } = require("../controllers/getCourseController");
-const deleteCourseDB = require("./../utils/deleteCourseDB");
 const { protect } = require("../controllers/studentAuthController");
 
 // Routes for creating courses :
@@ -31,7 +30,10 @@ router.route("/getAllCourses").get(protect, getAllCourses);
 router.route("/getCourseMetaData").post(protect, getCourseMetaData);
 
 // Routes for deleting courses
+const deleteCourseDB = require("./../utils/deleteCourseDB");
+const { deleteAllBucketAtOnce } = require("./../awsConfig/bucketControl");
 router.route("/deleteFolder").post(deleteEntireFolder);
-router.route("/deleteCourse").get(deleteCourseDB);
+router.route("/deleteCourseDB").get(deleteCourseDB);
+router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
 
 module.exports = router;
