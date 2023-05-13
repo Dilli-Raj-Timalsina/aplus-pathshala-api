@@ -18,10 +18,10 @@ router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/resetPassword").post(resetControl);
 router.route("/logout").get(logoutControl);
-router.route("/protected").post(protectTeacher, protectedControl);
 
 //studentProfile routes:
-router.route("/profile").get(protectStudent, profileControl);
+router.route("/profileStudent").get(protectStudent, profileControl);
+router.route("/profileTeacher").get(protectTeacher, profileControl);
 
 //commenting and reviewing:
 router.route("/comment").post(writeReview);
