@@ -1,4 +1,4 @@
-const AppError = require("./../errors/appError");
+const AppError = require("../errors/appError");
 const catchAsync = require("../errors/catchAsync");
 
 //1:) return all user profile information :

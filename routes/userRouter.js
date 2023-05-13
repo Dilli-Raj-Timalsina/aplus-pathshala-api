@@ -6,9 +6,10 @@ const {
     resetControl,
     logoutControl,
     protectedControl,
-    protect,
-} = require("../controllers/studentAuthController");
-const { profileControl } = require("../controllers/studentInfoController");
+    protectStudent,
+    protectTeacher,
+} = require("../controllers/userAuthController");
+const { profileControl } = require("../controllers/userInfoController");
 const { writeReview } = require("../controllers/reviewController");
 
 // studentAuth routes :
@@ -17,10 +18,10 @@ router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/resetPassword").post(resetControl);
 router.route("/logout").get(logoutControl);
-router.route("/protected").post(protect, protectedControl);
+router.route("/protected").post(protectTeacher, protectedControl);
 
 //studentProfile routes:
-router.route("/profile").get(protect, profileControl);
+router.route("/profile").get(protectStudent, profileControl);
 
 //commenting and reviewing:
 router.route("/comment").post(writeReview);

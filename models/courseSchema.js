@@ -94,8 +94,7 @@ const courseSchema = new Schema({
     },
     content: [folderSchema],
     review: [reviewSchema],
-    teacher: [{ type: Schema.Types.ObjectId, ref: "Teacher", required: false }],
-    student: [{ type: Schema.Types.ObjectId, ref: "Student", required: false }],
+    user: [{ type: Schema.Types.ObjectId, ref: "Teacher", required: false }],
 });
 
 const Course = mongoose.model("Course", courseSchema);

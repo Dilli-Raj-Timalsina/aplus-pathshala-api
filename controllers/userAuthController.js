@@ -3,13 +3,13 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const { promisify } = require("util");
 
-const AppError = require("./../errors/appError");
+const AppError = require("../errors/appError");
 const catchAsync = require("../errors/catchAsync");
 
-const sendMail = require("./../utils/email");
+const sendMail = require("../utils/email");
 
-const User = require("../models/studentSchema");
-const Course = require("./../models/courseSchema");
+const User = require("../models/userSchema");
+const Course = require("../models/courseSchema");
 
 // 1:) return new jwt based on passed payload
 const signToken = async (user) => {
@@ -35,7 +35,7 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
-    const { _id, name, email, course, profilePicture, contact } = user;
+    const { _id, name, email, course, profilePicture, contact, role } = user;
     const userProfile = {
         _id,
         name,
@@ -43,6 +43,7 @@ const createSendToken = async (user, statusCode, res) => {
         course,
         profilePicture,
         contact,
+        role,
     };
 
     res.status(statusCode).json({
@@ -51,21 +52,26 @@ const createSendToken = async (user, statusCode, res) => {
         userProfile,
     });
 };
-
-//3:) protect unauthorized student from  courses ,jwt is extracted from authorization header
-//not from req.cookies
-const protect = catchAsync(async (req, res, next) => {
-    // a) Getting token and check of it's there
-    let token;
-    console.log(req.headers.authorization + "req.headers.authorization");
-    console.log(req.cookie + "req.cookie.jwt");
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")
-    ) {
-        token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies.jwt) {
-        token = req.cookies.jwt;
+// 3:) general token leven authentication for both student and teacher
+const generalProtect = async (req) => {
+    try {
+        // a) Getting token and check of it's there
+        let token;
+        console.log(req.headers.authorization + "req.headers.authorization");
+        console.log(req.cookie + "req.cookie.jwt");
+        if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith("Bearer")
+        ) {
+            token = req.headers.authorization.split(" ")[1];
+        } else if (req.cookies.jwt) {
+            token = req.cookies.jwt;
+        }
+    } catch (err) {
+        throw new AppError(
+            "Please provide token in req.headers or req.cokkie",
+            400
+        );
     }
 
     if (!token) {
@@ -89,13 +95,39 @@ const protect = catchAsync(async (req, res, next) => {
             )
         );
     }
+    return currentUser;
+};
+
+//4:) protect unauthorized teacher from  courses
+const protectTeacher = catchAsync(async (req, res, next) => {
+    const currentUser = generalProtect(req);
+    if (currentUser.role != "teacher") {
+        throw new AppError(
+            "You are not a teacher, create a teacher account",
+            401
+        );
+    }
 
     // GRANT ACCESS TO PROTECTED ROUTE
     req.user = currentUser;
     next();
 });
 
-//3:) signup user based on req.body and return jwt via cookie
+//5:) protect unauthorized student from  courses
+const protectStudent = catchAsync(async (req, res, next) => {
+    const currentUser = generalProtect(req);
+    if (currentUser.role != "student") {
+        throw new AppError(
+            "You are not a teacher, create a teacher account",
+            401
+        );
+    }
+    // GRANT ACCESS TO PROTECTED ROUTE
+    req.user = currentUser;
+    next();
+});
+
+//6:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
     //check whether user already exist or not/ duplicate email
     if (await User.findOne({ email: req.body.email })) {
@@ -110,7 +142,7 @@ const signupControl = catchAsync(async (req, res) => {
     await createSendToken(user, 200, res);
 });
 
-//4:) login in user based on {email,password} and send jwt in cokkie
+//7:) login in user based on {email,password} and send jwt in cokkie
 const loginControl = catchAsync(async (req, res) => {
     const { email, password } = req.body;
 
@@ -165,7 +197,7 @@ const forgetControl = catchAsync(async (req, res, next) => {
     });
 });
 
-//6:) this is 2nd redirected hit for forgetpassword
+//8:) this is 2nd redirected hit for forgetpassword
 const resetControl = catchAsync(async (req, res) => {
     //a) getting user reset credential :
     const { url, password } = req.body;
@@ -191,7 +223,7 @@ const resetControl = catchAsync(async (req, res) => {
     });
 });
 
-//7:) logout user by putting jwt ==null in user's browser cookie
+//9:) logout user by putting jwt ==null in user's browser cookie
 const logoutControl = catchAsync(async (req, res, next) => {
     res.cookie("jwt", "loggedout", {
         expires: new Date(Date.now() + 10 * 1000),
@@ -212,6 +244,7 @@ module.exports = {
     forgetControl,
     resetControl,
     logoutControl,
-    protect,
+    protectStudent,
+    protectTeacher,
     protectedControl,
 };

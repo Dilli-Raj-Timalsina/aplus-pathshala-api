@@ -4,12 +4,11 @@ const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 const tokenSchema = require("./tokenSchema");
 
-//Teacher Schema Defination:
-const teacherSchema = new Schema({
+const userSchema = new Schema({
     name: {
         type: String,
+        required: true,
         unique: false,
-        required: false,
     },
     email: {
         type: String,
@@ -20,7 +19,7 @@ const teacherSchema = new Schema({
             validator: function (value) {
                 return validator.isEmail(value);
             },
-            message: "wrong email format !",
+            message: "wrong email format bro",
         },
     },
     password: {
@@ -28,35 +27,18 @@ const teacherSchema = new Schema({
         unique: false,
         required: false,
     },
-    passwordConfirm: {
-        type: String,
-        unique: false,
-        required: false,
-        validate: {
-            // This only works on CREATE and SAVE!!!
-            validator: function (value) {
-                return value === this.password;
-            },
-            message: "Passwords are not same!",
-        },
-    },
     contact: {
-        type: Number,
         required: false,
+        type: Number,
     },
-    profileImage: {
+    profilePicture: {
+        required: false,
         type: String,
-        required: false,
     },
-    avgRating: {
-        type: Number,
-        required: false,
-        default: 0,
-    },
-    google_id: {
-        type: Number,
-        required: false,
-        default: 100,
+    role: {
+        type: String,
+        enum: ["student", "teacher", "admin"],
+        default: "student",
     },
     resetToken: {
         type: tokenSchema,
@@ -65,21 +47,22 @@ const teacherSchema = new Schema({
     course: [{ type: Schema.Types.ObjectId, ref: "Course", required: false }],
 });
 
-teacherSchema.pre("save", async function (next) {
+//Middleware
+userSchema.pre("save", async function (next) {
+    // Only run this function if password was actually modified
     if (!this.isModified("password")) return next();
-
+    // Hash the password with cost of 12
     this.password = await bcrypt.hash(this.password, 10);
-
-    this.passwordConfirm = undefined;
     next();
 });
-
-teacherSchema.methods.correctPassword = async function (
+//Instance Methods starts over here:
+userSchema.methods.correctPassword = async function (
     candidatePassword,
     userPassword
 ) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-const Teacher = mongoose.model("Teacher", teacherSchema);
-module.exports = Teacher;
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
