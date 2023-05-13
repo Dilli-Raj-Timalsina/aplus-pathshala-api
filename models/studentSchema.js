@@ -35,6 +35,11 @@ const studentSchema = new Schema({
         required: false,
         type: String,
     },
+    role: {
+        type: String,
+        enum: ["student", "teacher", "admin"],
+        default: "student",
+    },
     resetToken: {
         type: tokenSchema,
         default: () => ({}),
