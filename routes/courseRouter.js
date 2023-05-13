@@ -14,11 +14,11 @@ const {
     getFile,
 } = require("../controllers/getCourseController");
 const {
-    protectStudent,
     protectTeacher,
+    generalProtect,
 } = require("../controllers/userAuthController");
 
-// Routes for creating courses :
+// Routes for creating courses : only for role:"teacher"
 router.route("/editFolder").post(protectTeacher, editFolder);
 router
     .route("/uploadFolder")
