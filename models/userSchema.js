@@ -44,7 +44,12 @@ const userSchema = new Schema({
         type: tokenSchema,
         default: () => ({}),
     },
-    course: [{ type: Schema.Types.ObjectId, ref: "Course", required: false }],
+    createdCourse: [
+        { type: Schema.Types.ObjectId, ref: "Course", required: false },
+    ],
+    associatedCourse: [
+        { type: Schema.Types.ObjectId, ref: "Course", required: false },
+    ],
 });
 
 //Middleware

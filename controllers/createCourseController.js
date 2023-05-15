@@ -155,16 +155,19 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     }-course`;
     const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
 
+    const teacherID = req.user._id;
     const doc = await Course.create({
         ...req.body,
         bucketName: bucketName,
         thumbnail: thumbnailKey,
+        user: teacherID,
+        createdBy: req.user.name,
     });
+
     //insert course refID in assiociated teacher document,
-    const teacherID = req.user._id;
-    const newDoc = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
         teacherID,
-        { $push: { course: doc._id } },
+        { $push: { createdCourse: doc._id } },
         { new: true }
     );
 

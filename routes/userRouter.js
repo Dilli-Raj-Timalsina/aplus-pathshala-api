@@ -12,8 +12,8 @@ const { profileControl } = require("../controllers/userInfoController");
 const { writeReview } = require("../controllers/reviewController");
 
 // General Auth routes :
-router.route("/signup").post(generalProtect, signupControl);
-router.route("/login").post(generalProtect, loginControl);
+router.route("/signup").post(signupControl);
+router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(generalProtect, forgetControl);
 router.route("/resetPassword").post(generalProtect, resetControl);
 router.route("/logout").get(generalProtect, logoutControl);
