@@ -19,32 +19,16 @@ const {
 } = require("../controllers/userAuthController");
 
 // Routes for creating courses : only for role:"teacher"
-router.route("/editFolder").post(generalProtect, protectTeacher, editFolder);
+router.route("/editFolder").post(editFolder);
 router
     .route("/uploadFolder")
-    .post(
-        generalProtect,
-        protectTeacher,
-        upload.array("binary", 15),
-        uploadChapter
-    );
-router
-    .route("/createCourse")
-    .post(
-        generalProtect,
-        protectTeacher,
-        upload.single("binary"),
-        createNewCourse
-    );
+    .post(protectTeacher, upload.array("binary", 15), uploadChapter);
+router.route("/createCourse").post(upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
 // router.route("/getFile").post(protect, getFile);
-router
-    .route("/getAllCourses")
-    .get(generalProtect, protectTeacher, getAllCourses);
-router
-    .route("/getCourseMetaData")
-    .post(generalProtect, protectTeacher, getCourseMetaData);
+router.route("/getAllCourses").get(getAllCourses);
+router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses
 const deleteCourseDB = require("./../utils/deleteCourseDB");
