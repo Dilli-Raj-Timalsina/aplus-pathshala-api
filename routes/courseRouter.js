@@ -13,21 +13,22 @@ const {
     getCourseMetaData,
     getFile,
 } = require("../controllers/getCourseController");
-const { protect } = require("../controllers/studentAuthController");
+const {
+    protectTeacher,
+    generalProtect,
+} = require("../controllers/userAuthController");
 
-// Routes for creating courses :
-router.route("/editFolder").post(protect, editFolder);
+// Routes for creating courses : only for role:"teacher"
+router.route("/editFolder").post(editFolder);
 router
     .route("/uploadFolder")
-    .post(protect, upload.array("binary", 15), uploadChapter);
-router
-    .route("/createCourse")
-    .post(protect, upload.single("binary"), createNewCourse);
+    .post(protectTeacher, upload.array("binary", 15), uploadChapter);
+router.route("/createCourse").post(upload.single("binary"), createNewCourse);
 
 // Routes for getting courses
-router.route("/getFile").post(protect, getFile);
-router.route("/getAllCourses").get(protect, getAllCourses);
-router.route("/getCourseMetaData").post(protect, getCourseMetaData);
+// router.route("/getFile").post(protect, getFile);
+router.route("/getAllCourses").get(getAllCourses);
+router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses
 const deleteCourseDB = require("./../utils/deleteCourseDB");

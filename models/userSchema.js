@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 const tokenSchema = require("./tokenSchema");
 
-const studentSchema = new Schema({
+const userSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -35,15 +35,25 @@ const studentSchema = new Schema({
         required: false,
         type: String,
     },
+    role: {
+        type: String,
+        enum: ["student", "teacher", "admin"],
+        default: "student",
+    },
     resetToken: {
         type: tokenSchema,
         default: () => ({}),
     },
-    course: [{ type: Schema.Types.ObjectId, ref: "Course", required: false }],
+    createdCourse: [
+        { type: Schema.Types.ObjectId, ref: "Course", required: false },
+    ],
+    associatedCourse: [
+        { type: Schema.Types.ObjectId, ref: "Course", required: false },
+    ],
 });
 
 //Middleware
-studentSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next) {
     // Only run this function if password was actually modified
     if (!this.isModified("password")) return next();
     // Hash the password with cost of 12
@@ -51,13 +61,13 @@ studentSchema.pre("save", async function (next) {
     next();
 });
 //Instance Methods starts over here:
-studentSchema.methods.correctPassword = async function (
+userSchema.methods.correctPassword = async function (
     candidatePassword,
     userPassword
 ) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-const Student = mongoose.model("Student", studentSchema);
+const User = mongoose.model("User", userSchema);
 
-module.exports = Student;
+module.exports = User;

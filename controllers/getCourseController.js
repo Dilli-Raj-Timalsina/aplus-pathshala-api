@@ -34,10 +34,9 @@ const getFile = catchAsync(async (req, res, next) => {
 
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
-    const { bucketName } = req.body;
-    const doc = await Course.findOne({
-        bucketName: bucketName,
-    });
+    console.log(req.body._id);
+
+    const doc = await User.findById(req.body._id).populate("createdCourse");
     if (!doc) {
         throw new AppError(
             "cannot find such course ,please try correct bucketName",

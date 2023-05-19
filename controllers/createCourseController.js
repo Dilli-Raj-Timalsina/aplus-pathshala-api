@@ -1,6 +1,7 @@
 const catchAsync = require("../errors/catchAsync");
 const AppError = require("../errors/appError");
 const Course = require("../models/courseSchema");
+const User = require("../models/userSchema");
 const s3 = require("../awsConfig/credential");
 
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
@@ -154,11 +155,21 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     }-course`;
     const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
 
+    const teacherID = req.user._id;
     const doc = await Course.create({
         ...req.body,
         bucketName: bucketName,
         thumbnail: thumbnailKey,
+        user: teacherID,
+        createdBy: req.user.name,
     });
+
+    //insert course refID in assiociated teacher document,
+    await User.findByIdAndUpdate(
+        teacherID,
+        { $push: { createdCourse: doc._id } },
+        { new: true }
+    );
 
     // cloud work:
     // create a new course bucket

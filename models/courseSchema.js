@@ -92,10 +92,11 @@ const courseSchema = new Schema({
         type: String,
         required: false,
     },
+    createdBy: { type: String, required: true },
     content: [folderSchema],
     review: [reviewSchema],
-    teacher: [{ type: Schema.Types.ObjectId, ref: "Teacher", required: false }],
-    student: [{ type: Schema.Types.ObjectId, ref: "Student", required: false }],
+
+    user: [{ type: Schema.Types.ObjectId, ref: "User", required: false }],
 });
 
 const Course = mongoose.model("Course", courseSchema);

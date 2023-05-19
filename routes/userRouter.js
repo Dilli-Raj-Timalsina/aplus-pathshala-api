@@ -5,22 +5,21 @@ const {
     forgetControl,
     resetControl,
     logoutControl,
-    protectedControl,
-    protect,
-} = require("../controllers/studentAuthController");
-const { profileControl } = require("../controllers/studentInfoController");
+    protectTeacher,
+    generalProtect,
+} = require("../controllers/userAuthController");
+const { profileControl } = require("../controllers/userInfoController");
 const { writeReview } = require("../controllers/reviewController");
 
-// studentAuth routes :
+// General Auth routes :
 router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/resetPassword").post(resetControl);
 router.route("/logout").get(logoutControl);
-router.route("/protected").post(protect, protectedControl);
 
-//studentProfile routes:
-router.route("/profile").get(protect, profileControl);
+//General Profile routes:
+router.route("/profile").get(profileControl);
 
 //commenting and reviewing:
 router.route("/comment").post(writeReview);

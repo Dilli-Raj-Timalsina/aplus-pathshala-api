@@ -25,6 +25,7 @@ const deleteEntireFolder = async (req, res, next) => {
         },
         { new: true }
     );
+    //remove all parts from DBS
 
     //cloud work:
     const input1 = {
