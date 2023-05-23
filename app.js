@@ -7,6 +7,7 @@ const cors = require("cors");
 const allowedOrigins = [
     "http://localhost:3000",
     "https://a-pathshala-service-1.vercel.app",
+    "https://a-pathshala-service-1-git-b1course-the-gaurav-bhatt.vercel.app",
 ];
 app.use(
     cors({
