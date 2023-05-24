@@ -15,13 +15,13 @@ const { writeReview } = require("../controllers/reviewController");
 router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
-router.route("/resetPassword").post(resetControl);
-router.route("/logout").get(logoutControl);
+router.route("/resetPassword").post(generalProtect, resetControl);
+router.route("/logout").get(generalProtect, logoutControl);
 
 //General Profile routes:
-router.route("/profile").get(profileControl);
+router.route("/profile").get(generalProtect, profileControl);
 
 //commenting and reviewing:
-router.route("/comment").post(writeReview);
+router.route("/comment").post(generalProtect, writeReview);
 
 module.exports = router;
