@@ -2,6 +2,7 @@ const catchAsync = require("../errors/catchAsync");
 const AppError = require("../errors/appError");
 const Course = require("../models/courseSchema");
 const s3 = require("../awsConfig/credential");
+const User = require("./../models/userSchema");
 
 //It is used to give user the access to read object for certain time via secure link:
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
@@ -36,10 +37,10 @@ const getFile = catchAsync(async (req, res, next) => {
 const getCourseMetaData = catchAsync(async (req, res, next) => {
     console.log(req.body._id);
 
-    const doc = await User.findById(req.body._id).populate("createdCourse");
+    const doc = await Course.findById(req.body._id);
     if (!doc) {
         throw new AppError(
-            "cannot find such course ,please try correct bucketName",
+            "cannot find such course ,please try correct courseID",
             404
         );
     }
