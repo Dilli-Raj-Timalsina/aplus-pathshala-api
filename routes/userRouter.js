@@ -8,7 +8,10 @@ const {
     protectTeacher,
     generalProtect,
 } = require("../controllers/userAuthController");
-const { profileControl } = require("../controllers/userInfoController");
+const {
+    profileControl,
+    contactUsControl,
+} = require("../controllers/userInfoController");
 const { writeReview } = require("../controllers/reviewController");
 
 // General Auth routes :
@@ -20,6 +23,7 @@ router.route("/logout").get(generalProtect, logoutControl);
 
 //General Profile routes:
 router.route("/profile").get(generalProtect, profileControl);
+router.route("/contactUs").post(contactUsControl);
 
 //commenting and reviewing:
 router.route("/comment").post(generalProtect, writeReview);
