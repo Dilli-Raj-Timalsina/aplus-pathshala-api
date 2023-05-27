@@ -21,9 +21,10 @@ const contactUsControl = catchAsync(async (req, res, next) => {
         email: email,
         subject: subject,
         message: ` 
-         message : ${message},
+         Name : ${name} ,
+         Email :${email} ,
          contact : ${contact} ,
-         Name : ${name}
+         message : ${message},
         `,
     };
     //e) send reset password link to the user's email
