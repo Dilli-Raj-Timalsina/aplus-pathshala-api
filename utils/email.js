@@ -32,4 +32,5 @@ const sendMail = async (options) => {
     }
 };
 
+//export only sendMail function
 module.exports = sendMail;
