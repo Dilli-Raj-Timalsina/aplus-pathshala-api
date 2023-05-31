@@ -56,41 +56,41 @@ const createSendToken = async (user, statusCode, res) => {
 const generalProtect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
-    console.log(req.headers + "req.headers.authorization");
-    console.log(req.headers.authorization + "req.headers.authorization");
+    console.log(req.headers + "req.headers");
     console.log(req.cookies + "req.cookie.jwt");
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")
-    ) {
-        token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies.jwt) {
-        token = req.cookies.jwt;
-    }
-    console.log(token);
-    if (!token) {
-        return next(
-            new AppError(
-                "You are not logged in! Please log in to get access.",
-                401
-            )
-        );
-    }
+    console.log(req.headers.authorization + "req.headers.authorization");
+    // if (
+    //     req.headers.authorization &&
+    //     req.headers.authorization.startsWith("Bearer")
+    // ) {
+    //     token = req.headers.authorization.split(" ")[1];
+    // } else if (req.cookies.jwt) {
+    //     token = req.cookies.jwt;
+    // }
+    // console.log(token);
+    // if (!token) {
+    //     return next(
+    //         new AppError(
+    //             "You are not logged in! Please log in to get access.",
+    //             401
+    //         )
+    //     );
+    // }
 
-    // b) Verification token
-    const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
-    // c) Check if user still exists
-    const currentUser = await User.findById(decoded._id);
-    if (!currentUser) {
-        return next(
-            new AppError(
-                "The user belonging to this token does no longer exist.",
-                401
-            )
-        );
-    }
-    // GRANT ACCESS TO PROTECTED ROUTE
-    req.user = currentUser;
+    // // b) Verification token
+    // const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
+    // // c) Check if user still exists
+    // const currentUser = await User.findById(decoded._id);
+    // if (!currentUser) {
+    //     return next(
+    //         new AppError(
+    //             "The user belonging to this token does no longer exist.",
+    //             401
+    //         )
+    //     );
+    // }
+    // // GRANT ACCESS TO PROTECTED ROUTE
+    // req.user = currentUser;
     next();
 });
 
