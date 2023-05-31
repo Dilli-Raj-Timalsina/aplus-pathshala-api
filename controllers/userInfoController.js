@@ -34,7 +34,7 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //f) if everything succeds then send success message
     res.status(200).json({
         status: "success",
-        message: "checkout your email for contact information",
+        message: "checkout your email to see who have registered.",
     });
 });
 
