@@ -17,10 +17,6 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     const { name, email, contact } = req.body;
 
     const student = await User.findOne({ email: email });
-    console.log(req.file);
-    if (!student) {
-        throw new AppError("Please login first", 400);
-    }
 
     //d) preparing credentials to send user an email:
     const options = {
