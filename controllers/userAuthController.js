@@ -6,7 +6,7 @@ const { promisify } = require("util");
 const AppError = require("../errors/appError");
 const catchAsync = require("../errors/catchAsync");
 
-const sendMail = require("../utils/email");
+const { sendMailNormal, sendMailPayMent } = require("../utils/email");
 
 const User = require("../models/userSchema");
 const Course = require("../models/courseSchema");
@@ -56,17 +56,13 @@ const createSendToken = async (user, statusCode, res) => {
 const generalProtect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
-    console.log(req.headers.authorization + "req.headers.authorization");
-    console.log(req.cookies + "req.cookie.jwt");
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
     ) {
         token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies.jwt) {
-        token = req.cookies.jwt;
     }
-
+    console.log(token);
     if (!token) {
         return next(
             new AppError(
@@ -183,7 +179,7 @@ const forgetControl = catchAsync(async (req, res, next) => {
     Please Notice that this is one time reset link and don't share with others`,
     };
     //e) send reset password link to the user's email
-    await sendMail(options);
+    await sendMailNormal(options);
 
     //f) if everything succeds then send success message
     res.status(200).json({

@@ -44,12 +44,14 @@ const userSchema = new Schema({
         type: tokenSchema,
         default: () => ({}),
     },
-    createdCourse: [
-        { type: Schema.Types.ObjectId, ref: "Course", required: false },
-    ],
-    associatedCourse: [
-        { type: Schema.Types.ObjectId, ref: "Course", required: false },
-    ],
+    paymentSlip: {
+        type: String,
+        required: false,
+    },
+    haveEnrolled: {
+        type: Boolean,
+        required: false,
+    },
 });
 
 //Middleware
