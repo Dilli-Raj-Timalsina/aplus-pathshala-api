@@ -57,10 +57,10 @@ const generalProtect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
     console.log("hello");
-    console.log(req.cookies + "req.cookie.jwt");
-    console.log(req.headers.authorization + "req.headers.authorization");
+    console.log(req.cookies, "req.cookie.jwt");
+    console.log(req.headers.authorization, "req.headers.authorization");
     console.log("hi");
-    console.log(JSON.stringify(req.headers) + "req.headers");
+    console.log(JSON.stringify(req.headers), "req.headers");
     // if (
     //     req.headers.authorization &&
     //     req.headers.authorization.startsWith("Bearer")
