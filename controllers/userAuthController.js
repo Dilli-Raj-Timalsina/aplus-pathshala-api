@@ -56,9 +56,6 @@ const createSendToken = async (user, statusCode, res) => {
 const generalProtect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
-    console.log("hello");
-    console.log(req.headers.authorization, "req.headers.authorization");
-    console.log("hi");
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
