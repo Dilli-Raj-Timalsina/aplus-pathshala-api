@@ -6,7 +6,7 @@ const { promisify } = require("util");
 const AppError = require("../errors/appError");
 const catchAsync = require("../errors/catchAsync");
 
-const sendMail = require("../utils/email");
+const { sendMailNormal, sendMailPayMent } = require("../utils/email");
 
 const User = require("../models/userSchema");
 const Course = require("../models/courseSchema");
@@ -183,7 +183,7 @@ const forgetControl = catchAsync(async (req, res, next) => {
     Please Notice that this is one time reset link and don't share with others`,
     };
     //e) send reset password link to the user's email
-    await sendMail(options);
+    await sendMailNormal(options);
 
     //f) if everything succeds then send success message
     res.status(200).json({
