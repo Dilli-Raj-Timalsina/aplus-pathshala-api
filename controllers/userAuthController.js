@@ -56,7 +56,7 @@ const createSendToken = async (user, statusCode, res) => {
 const generalProtect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
     let token;
-    console.log(req.headers.authorization + "req.headers.authorization");
+    console.log(req.headers + "req.headers.authorization");
     console.log(req.cookies + "req.cookie.jwt");
     if (
         req.headers.authorization &&
@@ -66,7 +66,7 @@ const generalProtect = catchAsync(async (req, res, next) => {
     } else if (req.cookies.jwt) {
         token = req.cookies.jwt;
     }
-
+    console.log(token);
     if (!token) {
         return next(
             new AppError(

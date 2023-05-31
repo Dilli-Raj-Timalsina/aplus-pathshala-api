@@ -58,7 +58,6 @@ const sendMailPayMent = async (options, file) => {
             const readableStream = new Readable();
             readableStream.push(file.buffer);
             readableStream.push(null);
-            console.log(readableStream);
 
             const attachment = {
                 filename: file.originalname,
