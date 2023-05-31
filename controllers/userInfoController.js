@@ -16,8 +16,6 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
     const { name, email, contact } = req.body;
 
-    const student = await User.findOne({ email: email });
-
     //d) preparing credentials to send user an email:
     const options = {
         email: email,
