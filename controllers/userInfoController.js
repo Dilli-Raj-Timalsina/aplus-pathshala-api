@@ -22,6 +22,7 @@ const profileControl = catchAsync(async (req, res, next) => {
 //2:) verify payment:
 const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
+    const newName = req.body.name;
     const { email } = req.body;
     if (!(await User.findOne({ email: email }))) {
         throw new AppError(
@@ -42,7 +43,7 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
         email: email,
         subject: "Hey Payment from A+ pathshala",
         message: ` 
-         Name : ${name} ,
+         Name : ${newName} ,
          Email :${email} ,
          contact : ${contact} ,
         `,
