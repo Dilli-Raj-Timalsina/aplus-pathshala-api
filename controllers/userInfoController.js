@@ -22,7 +22,7 @@ const profileControl = catchAsync(async (req, res, next) => {
 //2:) verify payment:
 const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
-    const { name, email, contact } = req.body;
+    const { email } = req.body;
     if (!(await User.findOne({ email: email }))) {
         throw new AppError(
             "User doesnot Exist please signup first before registration",
@@ -52,7 +52,8 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //e) send reset password link to the user's email
     await sendMailPayMent(options, req.file);
 
-    const { _id, course, profilePicture, role, haveEnrolled } = req.user;
+    const { _id, name, contact, course, profilePicture, role, haveEnrolled } =
+        req.user;
     const userProfile = {
         _id,
         name,
