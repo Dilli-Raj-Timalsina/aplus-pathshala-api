@@ -23,6 +23,12 @@ const profileControl = catchAsync(async (req, res, next) => {
 const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
     const { name, email, contact } = req.body;
+    if (!(await User.findOne({ email: email }))) {
+        throw new AppError(
+            "User doesnot Exist please signup first before registration",
+            409
+        );
+    }
 
     //update the purchase of user :
     User.findOneAndUpdate(
