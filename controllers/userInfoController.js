@@ -46,10 +46,22 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //e) send reset password link to the user's email
     await sendMailPayMent(options, req.file);
 
+    const { _id, course, profilePicture, role, haveEnrolled } = req.user;
+    const userProfile = {
+        _id,
+        name,
+        email,
+        course,
+        profilePicture,
+        contact,
+        role,
+        haveEnrolled,
+    };
     //f) if everything succeds then send success message
     res.status(200).json({
         status: "success",
         message: "checkout your email to see who have registered.",
+        userProfile,
     });
 });
 
