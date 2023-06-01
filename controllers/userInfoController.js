@@ -34,9 +34,7 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     User.findOneAndUpdate(
         { email: email },
         {
-            $set: {
-                haveEnrolled: true,
-            },
+            $set: { haveEnrolled: true },
         }
     );
     //d) preparing credentials to send user an email:
@@ -62,7 +60,7 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
         profilePicture,
         contact,
         role,
-        haveEnrolled,
+        haveEnrolled: true,
     };
     //f) if everything succeds then send success message
     res.status(200).json({
