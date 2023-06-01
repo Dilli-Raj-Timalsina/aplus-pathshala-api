@@ -174,15 +174,17 @@ const forgetControl = catchAsync(async (req, res, next) => {
     const resetToken = Math.floor(Math.random() * 9000) + 1000;
 
     //c) update user's token with salted and hashed token :
-    const hash = await bcrypt.hash(resetToken, 10);
-    await User.findOneAndUpdate({ email: email }, { "resetToken.token": hash });
+    await User.findOneAndUpdate(
+        { email: email },
+        { "resetToken.token": resetToken }
+    );
 
     //d) preparing credentials to send user an email:
 
     const options = {
         email: email,
         subject: "Reset password A+ pathshala ",
-        message: `Your reset OTP is   : ${randomNum}\n
+        message: `Your reset OTP is   : ${resetToken}\n
     please do not share it with anybody `,
     };
     //e) send reset password link to the user's email
@@ -202,7 +204,7 @@ const resetControl = catchAsync(async (req, res) => {
 
     //b) if user doesn't exist or token is invalid
     const user = await User.findOne({ email: email });
-    if (!user || !(await bcrypt.compare(token, user.resetToken.token))) {
+    if (!user || !(token == user.resetToken.token)) {
         throw new AppError(
             "Invalid or expired token, please reset again!!",
             403
