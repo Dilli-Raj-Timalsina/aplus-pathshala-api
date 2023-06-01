@@ -35,7 +35,16 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
-    const { _id, name, email, course, profilePicture, contact, role } = user;
+    const {
+        _id,
+        name,
+        email,
+        course,
+        profilePicture,
+        contact,
+        role,
+        haveEnrolled,
+    } = user;
     const userProfile = {
         _id,
         name,
