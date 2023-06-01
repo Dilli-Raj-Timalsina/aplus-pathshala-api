@@ -8,7 +8,15 @@ const profileControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
     const { _id, name, email, course, profilePicture, contact } = req.user;
     //send required profile information:
-    res.status(200).json({ _id, name, email, course, profilePicture, contact });
+    res.status(200).json({
+        _id,
+        name,
+        email,
+        course,
+        profilePicture,
+        contact,
+        haveEnrolled,
+    });
 });
 
 //2:) verify payment:
@@ -16,6 +24,15 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
     const { name, email, contact } = req.body;
 
+    //update the purchase of user :
+    User.findOneAndUpdate(
+        { email: email },
+        {
+            $set: {
+                haveEnrolled: true,
+            },
+        }
+    );
     //d) preparing credentials to send user an email:
     const options = {
         email: email,

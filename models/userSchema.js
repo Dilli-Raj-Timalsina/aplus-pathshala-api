@@ -50,7 +50,7 @@ const userSchema = new Schema({
     },
     haveEnrolled: {
         type: Boolean,
-        required: false,
+        default: false,
     },
 });
 

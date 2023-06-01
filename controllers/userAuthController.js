@@ -44,6 +44,7 @@ const createSendToken = async (user, statusCode, res) => {
         profilePicture,
         contact,
         role,
+        haveEnrolled,
     };
 
     res.status(statusCode).json({
