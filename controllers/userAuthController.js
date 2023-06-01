@@ -198,9 +198,9 @@ const forgetControl = catchAsync(async (req, res, next) => {
 });
 
 //9:) this is 2nd redirected hit for forgetpassword
-const resetControl = catchAsync(async (req, res) => {
+const verifyControl = catchAsync(async (req, res) => {
     //a) getting user reset credential :
-    const { email, password, token } = req.body;
+    const { email, token } = req.body;
 
     //b) if user doesn't exist or token is invalid
     const user = await User.findOne({ email: email });
@@ -210,9 +210,23 @@ const resetControl = catchAsync(async (req, res) => {
             403
         );
     }
+    //d) change token value to empty string
+    await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
+    //e) if reset is successful then send success message
+    res.status(200).json({
+        status: "success",
+        message: "verification has done, change the password now",
+    });
+});
+
+//9:) this is 2nd redirected hit for forgetpassword
+const resetControl = catchAsync(async (req, res) => {
+    //a) getting user reset credential :
+    const { email, password } = req.body;
+
     //c) hash the password and update
     const hash = await bcrypt.hash(password, 10);
-    await User.updateOne({ password: hash });
+    await User.findOneAndUpdate({ email: email }, { password: hash });
     //d) change token value to empty string
     await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
 
@@ -241,4 +255,5 @@ module.exports = {
     logoutControl,
     protectTeacher,
     generalProtect,
+    verifyControl,
 };

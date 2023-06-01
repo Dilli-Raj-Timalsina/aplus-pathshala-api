@@ -7,6 +7,7 @@ const {
     logoutControl,
     protectTeacher,
     generalProtect,
+    verifyControl,
 } = require("../controllers/userAuthController");
 const {
     profileControl,
@@ -20,7 +21,8 @@ const upload = require("./../awsConfig/multerSetup"); // Multer setup for file u
 router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
-router.route("/resetPassword").post(generalProtect, resetControl);
+router.route("/verifyToken").post(verifyControl);
+router.route("/resetPassword").post(resetControl);
 router.route("/logout").get(generalProtect, logoutControl);
 router
     .route("/verifyPayment")
