@@ -171,22 +171,19 @@ const forgetControl = catchAsync(async (req, res, next) => {
         throw new AppError("User does not exist");
     }
     //b) generate reset token:
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = Math.floor(Math.random() * 9000) + 1000;
 
     //c) update user's token with salted and hashed token :
     const hash = await bcrypt.hash(resetToken, 10);
     await User.findOneAndUpdate({ email: email }, { "resetToken.token": hash });
 
     //d) preparing credentials to send user an email:
-    const link = `${req.protocol}://${req.get(
-        "host"
-    )}/api/v1/student/passwordReset?token=${resetToken}&id=${user._id}`;
+
     const options = {
         email: email,
         subject: "Reset password A+ pathshala ",
-        message: `${link} \n
-    click the above link to reset your password, \n
-    Please Notice that this is one time reset link and don't share with others`,
+        message: `Your reset OTP is   : ${randomNum}\n
+    please do not share it with anybody `,
     };
     //e) send reset password link to the user's email
     await sendMailNormal(options);
@@ -201,21 +198,21 @@ const forgetControl = catchAsync(async (req, res, next) => {
 //9:) this is 2nd redirected hit for forgetpassword
 const resetControl = catchAsync(async (req, res) => {
     //a) getting user reset credential :
-    const { url, password } = req.body;
-    //extract token and userId from url
-    const token = url.split("=")[1].split("&")[0];
-    const userId = url.split("=")[2];
+    const { email, password, token } = req.body;
 
     //b) if user doesn't exist or token is invalid
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ email: email });
     if (!user || !(await bcrypt.compare(token, user.resetToken.token))) {
-        throw new AppError("Invalid or expired password reset token");
+        throw new AppError(
+            "Invalid or expired token, please reset again!!",
+            403
+        );
     }
     //c) hash the password and update
     const hash = await bcrypt.hash(password, 10);
     await User.updateOne({ password: hash });
     //d) change token value to empty string
-    await User.findOneAndUpdate({ _id: userId }, { "resetToken.token": "" });
+    await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
 
     //e) if reset is successful then send success message
     res.status(200).json({
