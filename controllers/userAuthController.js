@@ -132,7 +132,7 @@ const protectTeacher = catchAsync(async (req, res, next) => {
 const signupControl = catchAsync(async (req, res) => {
     //check whether user already exist or not/ duplicate email
     if (await User.findOne({ email: req.body.email })) {
-        return new AppError("User Already Exist with this Email", 409);
+        throw new AppError("User Already Exist with this Email", 409);
     }
 
     const user = await User.create({
