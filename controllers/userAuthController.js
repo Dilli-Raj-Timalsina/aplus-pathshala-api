@@ -86,7 +86,7 @@ const generalProtect = catchAsync(async (req, res, next) => {
     const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
     console.log(decoded);
     // c) Check if user still exists
-    const currentUser = await User.findOne({ email: decoded.email });
+    const currentUser = await User.findOne({ _id: decoded._id });
     if (!currentUser) {
         return next(
             new AppError(
