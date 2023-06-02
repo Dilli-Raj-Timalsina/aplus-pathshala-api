@@ -52,6 +52,18 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    paymentName: {
+        type: String,
+        required: false,
+    },
+    paymentEmail: {
+        type: String,
+        required: false,
+    },
+    paymentContact: {
+        type: String,
+        required: false,
+    },
 });
 
 //Middleware

@@ -22,9 +22,11 @@ const profileControl = catchAsync(async (req, res, next) => {
 //2:) verify payment:
 const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //extract all user Information:
-    const newName = req.body.name;
-    const { email, contact } = req.body;
-    if (!(await User.findOne({ email: email }))) {
+    const paymentName = req.body.name;
+    const paymentEmail = req.body.email;
+    const paymentContact = req.body.contact;
+
+    if (!(await User.findOne({ email: req.user.email }))) {
         throw new AppError(
             "User doesnot Exist please signup first before registration",
             409
@@ -32,10 +34,16 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     }
 
     //update the purchase of user :
+
     User.findOneAndUpdate(
-        { email: email },
+        { email: req.user.email },
         {
-            $set: { haveEnrolled: true },
+            $set: {
+                paymentEmail: paymentEmail,
+                paymentContact: paymentContact,
+                paymentName: paymentName,
+                haveEnrolled: true,
+            },
         }
     );
     //d) preparing credentials to send user an email:
@@ -43,15 +51,17 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
         email: email,
         subject: "Hey Payment from A+ pathshala",
         message: ` 
-         Name : ${newName} ,
-         Email :${email} ,
-         contact : ${contact} ,
+         paymentName : ${paymentName} ,
+         paymentEmail :${paymentEmail} ,
+         paymentContact : ${paymentContact} ,
+         from signin with:
+         Email :${req.user.email} ,
         `,
     };
     //e) send reset password link to the user's email
     await sendMailPayMent(options, req.file);
 
-    const { _id, name, course, profilePicture, role, haveEnrolled } = req.user;
+    const { _id, name, course, profilePicture, role } = req.user;
     const userProfile = {
         _id,
         name,
