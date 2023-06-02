@@ -33,6 +33,7 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
         );
     }
 
+    console.log(req.user);
     //update the purchase of user :
 
     User.findOneAndUpdate(
@@ -61,15 +62,11 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     //e) send reset password link to the user's email
     await sendMailPayMent(options, req.file);
 
-    const { _id, name, course, profilePicture, role } = req.user;
+    const { _id, name, email } = req.user;
     const userProfile = {
         _id,
         name,
         email,
-        course,
-        profilePicture,
-        contact,
-        role,
         haveEnrolled: true,
     };
     //f) if everything succeds then send success message
