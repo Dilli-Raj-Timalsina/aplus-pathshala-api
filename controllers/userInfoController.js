@@ -34,9 +34,9 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     }
 
     console.log(req.user);
-    //update the purchase of user :
 
-    User.findOneAndUpdate(
+    //update the purchase of user :
+    await User.findOneAndUpdate(
         { email: req.user.email },
         {
             $set: {
