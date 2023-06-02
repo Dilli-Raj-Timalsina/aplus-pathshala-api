@@ -48,7 +48,7 @@ const verifyPaymentControl = catchAsync(async (req, res, next) => {
     );
     //d) preparing credentials to send user an email:
     const options = {
-        email: email,
+        email: req.user.email,
         subject: "Hey Payment from A+ pathshala",
         message: ` 
          paymentName : ${paymentName} ,
