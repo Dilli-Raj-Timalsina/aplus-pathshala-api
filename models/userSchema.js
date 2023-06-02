@@ -50,6 +50,18 @@ const userSchema = new Schema({
     },
     haveEnrolled: {
         type: Boolean,
+        default: false,
+    },
+    paymentName: {
+        type: String,
+        required: false,
+    },
+    paymentEmail: {
+        type: String,
+        required: false,
+    },
+    paymentContact: {
+        type: String,
         required: false,
     },
 });

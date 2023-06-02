@@ -35,7 +35,16 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
-    const { _id, name, email, course, profilePicture, contact, role } = user;
+    const {
+        _id,
+        name,
+        email,
+        course,
+        profilePicture,
+        contact,
+        role,
+        haveEnrolled,
+    } = user;
     const userProfile = {
         _id,
         name,
@@ -44,6 +53,7 @@ const createSendToken = async (user, statusCode, res) => {
         profilePicture,
         contact,
         role,
+        haveEnrolled,
     };
 
     res.status(statusCode).json({
@@ -74,8 +84,9 @@ const generalProtect = catchAsync(async (req, res, next) => {
 
     // b) Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
+    console.log(decoded);
     // c) Check if user still exists
-    const currentUser = await User.findById(decoded._id);
+    const currentUser = await User.findOne({ _id: decoded._id });
     if (!currentUser) {
         return next(
             new AppError(
@@ -122,7 +133,7 @@ const protectTeacher = catchAsync(async (req, res, next) => {
 const signupControl = catchAsync(async (req, res) => {
     //check whether user already exist or not/ duplicate email
     if (await User.findOne({ email: req.body.email })) {
-        return new AppError("User Already Exist with this Email", 409);
+        throw new AppError("User Already Exist with this Email", 409);
     }
 
     const user = await User.create({
@@ -161,22 +172,21 @@ const forgetControl = catchAsync(async (req, res, next) => {
         throw new AppError("User does not exist");
     }
     //b) generate reset token:
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = Math.floor(Math.random() * 9000) + 1000;
 
     //c) update user's token with salted and hashed token :
-    const hash = await bcrypt.hash(resetToken, 10);
-    await User.findOneAndUpdate({ email: email }, { "resetToken.token": hash });
+    await User.findOneAndUpdate(
+        { email: email },
+        { "resetToken.token": resetToken }
+    );
 
     //d) preparing credentials to send user an email:
-    const link = `${req.protocol}://${req.get(
-        "host"
-    )}/api/v1/student/passwordReset?token=${resetToken}&id=${user._id}`;
+
     const options = {
         email: email,
         subject: "Reset password A+ pathshala ",
-        message: `${link} \n
-    click the above link to reset your password, \n
-    Please Notice that this is one time reset link and don't share with others`,
+        message: `Your reset OTP is   : ${resetToken}\n
+    please do not share it with anybody `,
     };
     //e) send reset password link to the user's email
     await sendMailNormal(options);
@@ -189,23 +199,37 @@ const forgetControl = catchAsync(async (req, res, next) => {
 });
 
 //9:) this is 2nd redirected hit for forgetpassword
-const resetControl = catchAsync(async (req, res) => {
+const verifyControl = catchAsync(async (req, res) => {
     //a) getting user reset credential :
-    const { url, password } = req.body;
-    //extract token and userId from url
-    const token = url.split("=")[1].split("&")[0];
-    const userId = url.split("=")[2];
+    const { email, token } = req.body;
 
     //b) if user doesn't exist or token is invalid
-    const user = await User.findOne({ _id: userId });
-    if (!user || !(await bcrypt.compare(token, user.resetToken.token))) {
-        throw new AppError("Invalid or expired password reset token");
+    const user = await User.findOne({ email: email });
+    if (!user || !(token == user.resetToken.token)) {
+        throw new AppError(
+            "Invalid or expired token, please reset again!!",
+            403
+        );
     }
+    //d) change token value to empty string
+    await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
+    //e) if reset is successful then send success message
+    res.status(200).json({
+        status: "success",
+        message: "verification has done, change the password now",
+    });
+});
+
+//9:) this is 2nd redirected hit for forgetpassword
+const resetControl = catchAsync(async (req, res) => {
+    //a) getting user reset credential :
+    const { email, password } = req.body;
+
     //c) hash the password and update
     const hash = await bcrypt.hash(password, 10);
-    await User.updateOne({ password: hash });
+    await User.findOneAndUpdate({ email: email }, { password: hash });
     //d) change token value to empty string
-    await User.findOneAndUpdate({ _id: userId }, { "resetToken.token": "" });
+    await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
 
     //e) if reset is successful then send success message
     res.status(200).json({
@@ -232,4 +256,5 @@ module.exports = {
     logoutControl,
     protectTeacher,
     generalProtect,
+    verifyControl,
 };
