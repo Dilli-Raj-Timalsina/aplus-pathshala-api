@@ -71,7 +71,6 @@ const generalProtect = catchAsync(async (req, res, next) => {
 
     // b) Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
-    console.log(decoded);
     // c) Check if user still exists
     const currentUser = await User.findOne({ _id: decoded._id });
     if (!currentUser) {
@@ -142,9 +141,9 @@ const forgetControl = catchAsync(async (req, res, next) => {
 
     const options = {
         email: email,
-        subject: "Reset password A+ pathshala ",
+        subject: "Reset Password A+ pathshala ",
         message: `Your reset OTP is   : ${resetToken}\n
-    please do not share it with anybody `,
+                   please do not share it with anybody `,
     };
     //e) send reset password link to the user's email
     await sendMailNormal(options);
