@@ -5,7 +5,6 @@ const {
     forgetControl,
     resetControl,
     logoutControl,
-    protectTeacher,
     generalProtect,
     verifyControl,
 } = require("../controllers/userAuthController");
@@ -14,7 +13,6 @@ const {
     contactUsControl,
     verifyPaymentControl,
 } = require("../controllers/userInfoController");
-const { writeReview } = require("../controllers/reviewController");
 const upload = require("./../awsConfig/multerSetup"); // Multer setup for file uploads
 
 // General Auth routes :
@@ -31,8 +29,5 @@ router
 //General Profile routes:
 router.route("/profile").get(generalProtect, profileControl);
 router.route("/contactUs").post(contactUsControl);
-
-//commenting and reviewing:
-router.route("/comment").post(generalProtect, writeReview);
 
 module.exports = router;

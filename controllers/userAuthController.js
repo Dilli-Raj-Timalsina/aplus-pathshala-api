@@ -9,7 +9,6 @@ const catchAsync = require("../errors/catchAsync");
 const { sendMailNormal, sendMailPayMent } = require("../utils/email");
 
 const User = require("../models/userSchema");
-const Course = require("../models/courseSchema");
 
 // 1:) return new jwt based on passed payload
 const signToken = async (user) => {
@@ -35,24 +34,12 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
-    const {
-        _id,
-        name,
-        email,
-        course,
-        profilePicture,
-        contact,
-        role,
-        haveEnrolled,
-    } = user;
+    const { _id, name, email, contact, haveEnrolled } = user;
     const userProfile = {
         _id,
         name,
         email,
-        course,
-        profilePicture,
         contact,
-        role,
         haveEnrolled,
     };
 
@@ -72,7 +59,7 @@ const generalProtect = catchAsync(async (req, res, next) => {
     ) {
         token = req.headers.authorization.split(" ")[1];
     }
-    console.log(token);
+    //if token doesnot exist
     if (!token) {
         return next(
             new AppError(
@@ -99,35 +86,6 @@ const generalProtect = catchAsync(async (req, res, next) => {
     req.user = currentUser;
     next();
 });
-
-//4:) protect unauthorized teacher from  courses
-const protectTeacher = catchAsync(async (req, res, next) => {
-    const currentUser = req.user;
-    if (currentUser.role != "teacher") {
-        throw new AppError(
-            "You are not a teacher, create a teacher account",
-            401
-        );
-    }
-
-    // GRANT ACCESS TO PROTECTED ROUTE
-    req.user = currentUser;
-    next();
-});
-
-// //5:) protect unauthorized student from  courses
-// const protectStudent = catchAsync(async (req, res, next) => {
-//     const currentUser = req.user;
-//     if (currentUser.role != "student") {
-//         throw new AppError(
-//             "You are not a teacher, create a teacher account",
-//             401
-//         );
-//     }
-//     // GRANT ACCESS TO PROTECTED ROUTE
-//     req.user = currentUser;
-//     next();
-// });
 
 //6:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
@@ -254,7 +212,6 @@ module.exports = {
     forgetControl,
     resetControl,
     logoutControl,
-    protectTeacher,
     generalProtect,
     verifyControl,
 };

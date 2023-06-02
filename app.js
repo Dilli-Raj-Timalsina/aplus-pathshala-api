@@ -55,21 +55,10 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// passport configuration:
-const passport = require("passport");
-require("./authSetupGoogle/passport-google");
-// require("./authSetupGoogle/assport-jwt");
-app.use(passport.initialize());
-
 //Routes:
-const googleAuthRouter = require("./routes/googleAuthRouter");
 const userRouter = require("./routes/userRouter");
-const courseRouter = require("./routes/courseRouter");
-
-app.use(googleAuthRouter);
 
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/course", courseRouter);
 
 app.use("/", (req, res) => {
     res.status(200).json({

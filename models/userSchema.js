@@ -31,22 +31,9 @@ const userSchema = new Schema({
         required: false,
         type: Number,
     },
-    profilePicture: {
-        required: false,
-        type: String,
-    },
-    role: {
-        type: String,
-        enum: ["student", "teacher", "admin"],
-        default: "student",
-    },
     resetToken: {
         type: tokenSchema,
         default: () => ({}),
-    },
-    paymentSlip: {
-        type: String,
-        required: false,
     },
     haveEnrolled: {
         type: Boolean,
