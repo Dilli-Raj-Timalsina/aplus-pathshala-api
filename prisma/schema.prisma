@@ -7,6 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+type UsersResetToken {
+  id        String   @map("_id") @db.ObjectId
+  createdAt DateTime @db.Date
+}
+
+model courses {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 }
+
+model prank {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String
+  name     String
+  password String
+}
+
+model reviews {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model users {
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  v            Int             @map("__v")
+  contact      Float
+  email        String          @unique(map: "email_1")
+  haveEnrolled Boolean
+  name         String
+  password     String
+  resetToken   UsersResetToken
+  role         String
+
+  @@index([resetToken.createdAt], map: "resetToken.createdAt_1")
+}
+
+// schema.prisma
+
+model Token {
+  
+  id   String      @id  @default(auto()) @map("_id") @db.ObjectId
+  token     String? 
+  createdAt DateTime @default(now()) @db.Timestamp
+  
+  @@index([createdAt], map: "expiresAtIndex")
+}
+

@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 
 //MongoDB local Database Connection:
 try {
-    mongoose.connect(process.env.CONN);
+    mongoose.connect(process.env.DATABASE_URL);
     console.log("Data base connection succesfull");
 } catch (err) {
     console.log(err);
