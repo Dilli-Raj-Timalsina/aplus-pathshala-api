@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const prisma = require("./prisma/prismaClientExport");
 
 // Implement CORS
 // app.use(cors());
@@ -15,6 +16,15 @@ app.use(
         credentials: true,
     })
 );
+// app.get("/", async (req, res, next) => {
+//     await prisma.user.create({
+//         data: {
+//             name: "dilli",
+//             email: "dilli@gmail.com",
+//         },
+//     });
+//     res.end("okok");
+// });
 // Access-Control-Allow-Origin *
 // a+pathshala.com, front-end natours.com
 // app.use(cors({
