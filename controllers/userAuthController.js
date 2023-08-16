@@ -1,15 +1,12 @@
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const { promisify } = require("util");
 
 const AppError = require("../errors/appError");
 const catchAsync = require("../errors/catchAsync");
 
-const { sendMailNormal, sendMailPayMent } = require("../utils/email");
+const { sendMailNormal } = require("../utils/email");
 
-const User = require("../models/userSchema");
-const Course = require("../models/courseSchema");
 const prisma = require("./../prisma/prismaClientExport");
 
 // 1:) return new jwt based on passed payload
