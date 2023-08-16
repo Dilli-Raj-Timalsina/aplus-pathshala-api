@@ -10,6 +10,7 @@ const { sendMailNormal, sendMailPayMent } = require("../utils/email");
 
 const User = require("../models/userSchema");
 const Course = require("../models/courseSchema");
+const prisma = require("./../prisma/prismaClientExport");
 
 // 1:) return new jwt based on passed payload
 const signToken = async (user) => {
@@ -35,25 +36,11 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
-    const {
-        _id,
-        name,
-        email,
-        course,
-        profilePicture,
-        contact,
-        role,
-        haveEnrolled,
-    } = user;
+    const { id, name, email } = user;
     const userProfile = {
-        _id,
+        id,
         name,
         email,
-        course,
-        profilePicture,
-        contact,
-        role,
-        haveEnrolled,
     };
 
     res.status(statusCode).json({
@@ -86,7 +73,8 @@ const generalProtect = catchAsync(async (req, res, next) => {
     const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
     console.log(decoded);
     // c) Check if user still exists
-    const currentUser = await User.findOne({ _id: decoded._id });
+    const currentUser = await prisma.user.findFirst({ _id: decoded._id });
+    console.log(currentUser);
     if (!currentUser) {
         return next(
             new AppError(
@@ -132,12 +120,17 @@ const protectTeacher = catchAsync(async (req, res, next) => {
 //6:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
     //check whether user already exist or not/ duplicate email
-    if (await User.findOne({ email: req.body.email })) {
+    if (await prisma.user.findFirst({ where: { email: req.body.email } })) {
         throw new AppError("User Already Exist with this Email", 409);
     }
-
-    const user = await User.create({
-        ...req.body,
+    let { name, email, password } = req.body;
+    password = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+        data: {
+            name,
+            email,
+            password,
+        },
     });
 
     // if everything is ok :send token to the user
@@ -153,9 +146,9 @@ const loginControl = catchAsync(async (req, res) => {
         throw new AppError("email or password not provided", 403);
     }
     // b) Check if user exists && password is correct
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findFirst({ where: { email: email } });
 
-    if (!user || !(await user.correctPassword(password, user.password))) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new AppError("Incorrect email or password", 401);
     }
     //c) If everything is ok: send token to the logged in user
@@ -166,7 +159,7 @@ const loginControl = catchAsync(async (req, res) => {
 const forgetControl = catchAsync(async (req, res, next) => {
     //a) check whether user exist or not
     const { email } = req.body;
-    const user = await User.findOne({ email: email });
+    const user = await prisma.user.findFirst({ where: { email: email } });
 
     if (!user) {
         throw new AppError("User does not exist");
@@ -175,15 +168,16 @@ const forgetControl = catchAsync(async (req, res, next) => {
     const resetToken = Math.floor(Math.random() * 9000) + 1000;
 
     //c) update user's token with salted and hashed token :
-    await User.findOneAndUpdate(
-        { email: email },
-        { "resetToken.token": resetToken }
-    );
+
+    await prisma.user.update({
+        where: { email: email },
+        data: { token: resetToken + "" },
+    });
 
     //d) preparing credentials to send user an email:
 
     const options = {
-        email: email,
+        email: "dillirajtimalsina354@gmail.com",
         subject: "Reset password A+ pathshala ",
         message: `Your reset OTP is   : ${resetToken}\n
     please do not share it with anybody `,
@@ -204,15 +198,15 @@ const verifyControl = catchAsync(async (req, res) => {
     const { email, token } = req.body;
 
     //b) if user doesn't exist or token is invalid
-    const user = await User.findOne({ email: email });
-    if (!user || !(token == user.resetToken.token)) {
+    const user = await prisma.user.findFirst({ where: { email: email } });
+    if (!user || !(token == user.token)) {
         throw new AppError(
             "Invalid or expired token, please reset again!!",
             403
         );
     }
     //d) change token value to empty string
-    await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
+    await prisma.user.update({ where: { email: email }, data: { token: "" } });
     //e) if reset is successful then send success message
     res.status(200).json({
         status: "success",
@@ -227,9 +221,12 @@ const resetControl = catchAsync(async (req, res) => {
 
     //c) hash the password and update
     const hash = await bcrypt.hash(password, 10);
-    await User.findOneAndUpdate({ email: email }, { password: hash });
+    await prisma.user.update({
+        where: { email: email },
+        data: { password: hash },
+    });
     //d) change token value to empty string
-    await User.findOneAndUpdate({ email: email }, { "resetToken.token": "" });
+    await prisma.user.update({ where: { email: email }, data: { token: "" } });
 
     //e) if reset is successful then send success message
     res.status(200).json({

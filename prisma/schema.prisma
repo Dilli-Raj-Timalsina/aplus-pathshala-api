@@ -8,32 +8,33 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  email String @unique
-  // password  String   @unique
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String   @unique
+  token     String?
   // contact   Int
-  // role      Role     @default(user)
-  // courses   Course[] @relation(fields: [courseIds], references: [id])
-  // courseIds String[] @db.ObjectId
+  role      Role     @default(user)
+  courses   Course[] @relation(fields: [courseIds], references: [id])
+  courseIds String[] @db.ObjectId
 }
 
-// model Course {
-//   id           String    @id @default(auto()) @map("_id") @db.ObjectId
-//   title        String
-//   subTitle     String
-//   duration     Int
-//   language     String
-//   Price        Int
-//   discount     Int
-//   requirements String[]
-//   description  String
-//   categories   String
-//   createdAt    DateTime  @default(now())
-//   updatedAt    DateTime?
-//   userIds      String[]  @db.ObjectId
-//   users        User[]    @relation(fields: [userIds], references: [id])
-// }
+model Course {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  subTitle     String
+  duration     Int
+  language     String
+  Price        Int
+  discount     Int
+  requirements String[]
+  description  String
+  categories   String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+  userIds      String[]  @db.ObjectId
+  users        User[]    @relation(fields: [userIds], references: [id])
+}
 
 enum Role {
   user
