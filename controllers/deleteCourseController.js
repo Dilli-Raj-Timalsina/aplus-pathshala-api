@@ -1,6 +1,6 @@
 const catchAsync = require("../errors/catchAsync");
 const AppError = require("../errors/appError");
-const Course = require("../models/courseSchema");
+
 const s3 = require("../awsConfig/credential");
 
 const {

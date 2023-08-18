@@ -8,15 +8,13 @@ const {
     createNewCourse,
 } = require("../controllers/createCourseController");
 const { deleteEntireFolder } = require("../controllers/deleteCourseController");
+const { deleteAllBucketAtOnce } = require("./../awsConfig/bucketControl");
 const {
     getAllCourses,
     getCourseMetaData,
     getFile,
 } = require("../controllers/getCourseController");
-const {
-    protectTeacher,
-    generalProtect,
-} = require("../controllers/userAuthController");
+const { generalProtect } = require("../controllers/userAuthController");
 
 // Routes for creating courses : only for role:"teacher"
 // router.route("/editFolder").post(generalProtect, editFolder);
@@ -33,10 +31,8 @@ router.route("/getAllCourses").get(getAllCourses);
 router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses
-const deleteCourseDB = require("./../utils/deleteCourseDB");
-const { deleteAllBucketAtOnce } = require("./../awsConfig/bucketControl");
+
 router.route("/deleteFolder").post(deleteEntireFolder);
-router.route("/deleteCourseDB").get(deleteCourseDB);
 router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
 
 module.exports = router;

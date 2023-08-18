@@ -1,6 +1,6 @@
 const catchAsync = require("../errors/catchAsync");
 const AppError = require("../errors/appError");
-const Course = require("../models/courseSchema");
+const prisma = require("./../prisma/prismaClientExport");
 const s3 = require("../awsConfig/credential");
 
 //It is used to give user the access to read object for certain time via secure link:
@@ -34,9 +34,13 @@ const getFile = catchAsync(async (req, res, next) => {
 
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
-    console.log(req.body._id);
+    console.log(req.body.id);
 
-    const doc = await Course.findById(req.body._id);
+    const doc = await prisma.course.findFirst({
+        where: {
+            id: req.body.id,
+        },
+    });
     if (!doc) {
         throw new AppError(
             "cannot find such course ,please try correct courseID",
@@ -53,7 +57,7 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
 //3:) get all the  courses
 const getAllCourses = catchAsync(async (req, res, next) => {
     //return all course accoding to pagination:
-    const courses = await Course.find({});
+    const courses = await prisma.course.findMany();
     res.status(200).json({
         status: "sucess",
         courses,
