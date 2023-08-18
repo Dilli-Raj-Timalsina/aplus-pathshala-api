@@ -56,6 +56,7 @@ const generalProtect = catchAsync(async (req, res, next) => {
     ) {
         token = req.headers.authorization.split(" ")[1];
     }
+    console.log("hey");
     console.log(token);
     if (!token) {
         return next(

@@ -1,8 +1,8 @@
 const catchAsync = require("../errors/catchAsync");
 const AppError = require("../errors/appError");
-const Course = require("../models/courseSchema");
-const User = require("../models/userSchema");
+
 const s3 = require("../awsConfig/credential");
+const prisma = require("./../prisma/prismaClientExport");
 
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { createBucket } = require("../awsConfig/bucketControl");
@@ -30,43 +30,34 @@ const returnInputAccMimetype = (file, body, key) => {
 };
 
 //return true if there is content with folderName exist
-const doesExist = async (bucketName, folderName) => {
-    return !!(await Course.findOne({
-        bucketName: bucketName,
-        "content.folderName": folderName,
-    }));
-};
-
+// const doesExist = async (bucketName, folderName) => {
+//     return !!(await Course.findOne({
+//         bucketName: bucketName,
+//         "content.folderName": folderName,
+//     }));
+// };
+// const doesExist = async (bucketName, folderName) => {
+//     return !!(await prisma.course.findFirst({
+//         where: {
+//             bucketName: bucketName,
+//             include: {
+//                 content: {
+//                     where: {
+//                         folderName: folderName,
+//                     },
+//                 },
+//             },
+//         },
+//     }));
+// };
 //0:) Add remaining files to the folder:
-
-//1:) Edit Folder title of provided bucketName/folderName
-const editFolder = catchAsync(async (req, res, next) => {
-    const { bucketName, folderName, folderTitle } = req.body;
-
-    await Course.findOneAndUpdate(
-        { bucketName: bucketName, "content.folderName": folderName },
-        {
-            $set: { "content.$.folderTitle": folderTitle },
-        }
-    );
-    res.status(200).json({
-        status: "Success",
-        message: "Successfully edited Folder Title",
-    });
-});
 
 //2:) Uploads multiple files to the specified folder in the corresponding bucket/course
 const uploadChapter = catchAsync(async (req, res, next) => {
     //database work:
     //extract all data field related to folder/folderSchema
-    let { bucketName, folderName, folderTitle, free } = req.body;
+    let { folderName, folderTitle, free } = req.body;
     console.log("-----------------------------------------------------");
-    console.log(req.files);
-    console.log("req.files above");
-    console.log(req.body);
-    console.log("req.body above");
-    console.log(req.file);
-    console.log("req.file above");
 
     let videoTitles = [];
     let pdfFileTitles = [];
@@ -94,104 +85,112 @@ const uploadChapter = catchAsync(async (req, res, next) => {
         }
     });
 
-    const newFolder = {
-        folderName: folderName,
-        folderTitle: folderTitle,
-        videoTitles: videoTitles,
-        isFree: isFree,
-        pdfFileTitles: pdfFileTitles,
-        videoLinks: videoLinks,
-        pdfLinks: pdfLinks,
-    };
+    const createdFolder = await prisma.folder.create({
+        data: {
+            folderName: folderName,
+            folderTitle: folderTitle,
+            videoTitles: videoTitles,
+            isFree: isFree,
+            pdfFileTitles: pdfFileTitles,
+            videoLinks: videoLinks,
+            pdfLinks: pdfLinks,
+        },
+    });
 
-    if (!(await doesExist(bucketName, folderName))) {
-        await Course.findOneAndUpdate(
-            { bucketName: bucketName },
-            {
-                $push: { content: newFolder },
+    await prisma.course.update({
+        where: { id: "64defe7746f1f065b717adbb" },
+        data: {
+            content: {
+                connect: { id: createdFolder.id },
             },
-            { new: true }
-        );
+        },
+    });
 
-        //cloud work:
-        let i = 0,
-            j = 0;
-        const inputs = req.files.map((file) => {
-            if (file.mimetype == "video/mp4") {
-                i++;
-                return returnInputAccMimetype(
-                    file,
-                    req.body,
-                    videoLinks[i - 1]
-                );
-            } else {
-                j++;
-                return returnInputAccMimetype(file, req.body, pdfLinks[j - 1]);
-            }
-        });
+    //cloud work:
+    //     let i = 0,
+    //         j = 0;
+    //     const inputs = req.files.map((file) => {
+    //         if (file.mimetype == "video/mp4") {
+    //             i++;
+    //             return returnInputAccMimetype(
+    //                 file,
+    //                 req.body,
+    //                 videoLinks[i - 1]
+    //             );
+    //         } else {
+    //             j++;
+    //             return returnInputAccMimetype(file, req.body, pdfLinks[j - 1]);
+    //         }
+    //     });
 
-        //upload all files
-        await Promise.all(
-            inputs.map((input) => s3.send(new PutObjectCommand(input)))
-        );
-        res.status(200).json({
-            status: "Success",
-            message: "Successfully added new Folder",
-        });
-    } else {
-        throw new AppError(
-            "Chapter Already Exist, please create another or editFolder",
-            407
-        );
-    }
+    //     //upload all files
+    //     await Promise.all(
+    //         inputs.map((input) => s3.send(new PutObjectCommand(input)))
+    //     );
+    //     res.status(200).json({
+    //         status: "Success",
+    //         message: "Successfully added new Folder",
+    //     });
+    // } else {
+    //     throw new AppError(
+    //         "Chapter Already Exist, please create another or editFolder",
+    //         407
+    //     );
+
+    res.status(200).json({
+        status: "Success",
+        message: "Successfully added new Folder",
+    });
+    // }
 });
 
 //3:) create brand new course:
 const createNewCourse = catchAsync(async (req, res, next) => {
     //database work:
     //create new course in database with thumbnail reference to s3
-    const bucketName = `${Date.now()}-${
-        Math.floor(Math.random() * 500) + 1
-    }-course`;
-    const thumbnailKey = `${Date.now()}-${req.file.originalname}`;
+    const thumbNailKey = `${Date.now()}-${req.file.originalname}`;
 
-    const teacherID = req.user._id;
-    const doc = await Course.create({
-        ...req.body,
-        bucketName: bucketName,
-        thumbnail: thumbnailKey,
-        user: teacherID,
-        createdBy: req.user.name,
+    const teacherID = req.user.id;
+    const doc = await prisma.course.create({
+        data: {
+            ...req.body,
+            thumbNail: thumbNailKey,
+        },
     });
 
-    //insert course refID in assiociated teacher document,
-    await User.findByIdAndUpdate(
-        teacherID,
-        { $push: { createdCourse: doc._id } },
-        { new: true }
-    );
+    // connect userIds and CourseIds
+    const op = await prisma.user.update({
+        where: { id: teacherID },
+        data: {
+            courses: {
+                connect: {
+                    id: doc.id,
+                },
+            },
+        },
+    });
 
     // cloud work:
     // create a new course bucket
-    await createBucket({ Bucket: bucketName });
+    // await createBucket({ Bucket: bucketName });
 
-    // upload thumbnail in s3
-    const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: thumbnailKey,
-        Body: req.file.buffer,
-    });
-    await s3.send(command);
+    // // upload thumbnail in s3
+    // const command = new PutObjectCommand({
+    //     Bucket: bucketName,
+    //     Key: thumbnailKey,
+    //     Body: req.file.buffer,
+    // });
+    // await s3.send(command);
 
     res.status(200).json({
         status: "success",
-        bucketName: doc.bucketName,
-        _id: doc._id,
+        doc,
+        op,
     });
 });
 
 module.exports = {
     createNewCourse,
-    editFolder,
+
     uploadChapter,
 };

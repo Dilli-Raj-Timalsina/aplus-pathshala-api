@@ -2,7 +2,6 @@ const catchAsync = require("../errors/catchAsync");
 const AppError = require("../errors/appError");
 const Course = require("../models/courseSchema");
 const s3 = require("../awsConfig/credential");
-const User = require("./../models/userSchema");
 
 //It is used to give user the access to read object for certain time via secure link:
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");

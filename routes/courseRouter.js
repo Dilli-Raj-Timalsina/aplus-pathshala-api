@@ -3,7 +3,7 @@ const upload = require("./../awsConfig/multerSetup"); // Multer setup for file u
 
 //requiring all controller functions:
 const {
-    editFolder,
+    // editFolder,
     uploadChapter,
     createNewCourse,
 } = require("../controllers/createCourseController");
@@ -19,7 +19,7 @@ const {
 } = require("../controllers/userAuthController");
 
 // Routes for creating courses : only for role:"teacher"
-router.route("/editFolder").post(generalProtect, editFolder);
+// router.route("/editFolder").post(generalProtect, editFolder);
 router
     .route("/uploadFolder")
     .post(generalProtect, upload.array("binary", 15), uploadChapter);

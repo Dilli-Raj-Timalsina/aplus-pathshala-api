@@ -13,27 +13,42 @@ model User {
   email     String   @unique
   password  String   @unique
   token     String?
-  // contact   Int
+  contact   Int?
   role      Role     @default(user)
   courses   Course[] @relation(fields: [courseIds], references: [id])
   courseIds String[] @db.ObjectId
+  review    String[] @db.ObjectId
 }
 
 model Course {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   subTitle     String
-  duration     Int
+  duration     String
   language     String
-  Price        Int
-  discount     Int
+  price        String
   requirements String[]
   description  String
   categories   String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
+  thumbNail    String?
+  content      folder[]
   userIds      String[]  @db.ObjectId
   users        User[]    @relation(fields: [userIds], references: [id])
+}
+
+model folder {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  folderName    String
+  folderTitle   String
+  pdfFileTitles String[]
+  videoTitles   String[]
+  videoLinks    String[]
+  pdfLinks      String[]
+  isFree        Boolean[]
+  Course        Course?   @relation(fields: [courseId], references: [id])
+  courseId      String?   @db.ObjectId
 }
 
 enum Role {
@@ -45,11 +60,3 @@ model Token {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
 }
-
-// model Review {
-//   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-//   rating    Int
-//   comment   String?
-//   createdAt DateTime  @default(now())
-//   updatedAt DateTime?
-// }
