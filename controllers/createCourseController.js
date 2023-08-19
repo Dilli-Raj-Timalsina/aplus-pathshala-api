@@ -1,5 +1,4 @@
 const catchAsync = require("../errors/catchAsync");
-const AppError = require("../errors/appError");
 
 const s3 = require("../awsConfig/credential");
 const prisma = require("./../prisma/prismaClientExport");
@@ -7,8 +6,7 @@ const prisma = require("./../prisma/prismaClientExport");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { createBucket } = require("../awsConfig/bucketControl");
 
-const returnInputAccMimetype = (file, body, key) => {
-    const { bucketName } = body;
+const returnInputAccMimetype = (file, bucketName, key) => {
     const { mimetype } = file;
 
     if (mimetype == "video/mp4") {
@@ -55,6 +53,8 @@ const returnInputAccMimetype = (file, body, key) => {
 //2:) Uploads multiple files to the specified folder in the corresponding bucket/course
 const uploadChapter = catchAsync(async (req, res, next) => {
     //database work:
+    const courseId = (await prisma.user.findFirst({})).courseIds[0];
+    console.log(courseId);
     //extract all data field related to folder/folderSchema
     let { folderName, folderTitle, free } = req.body;
     console.log("-----------------------------------------------------");
@@ -98,7 +98,7 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     });
 
     await prisma.course.update({
-        where: { id: "64defe7746f1f065b717adbb" },
+        where: { id: courseId },
         data: {
             content: {
                 connect: { id: createdFolder.id },
@@ -106,42 +106,27 @@ const uploadChapter = catchAsync(async (req, res, next) => {
         },
     });
 
-    //cloud work:
-    //     let i = 0,
-    //         j = 0;
-    //     const inputs = req.files.map((file) => {
-    //         if (file.mimetype == "video/mp4") {
-    //             i++;
-    //             return returnInputAccMimetype(
-    //                 file,
-    //                 req.body,
-    //                 videoLinks[i - 1]
-    //             );
-    //         } else {
-    //             j++;
-    //             return returnInputAccMimetype(file, req.body, pdfLinks[j - 1]);
-    //         }
-    //     });
+    // cloud work:
+    let i = 0,
+        j = 0;
+    const inputs = req.files.map((file) => {
+        if (file.mimetype == "video/mp4") {
+            i++;
+            return returnInputAccMimetype(file, req.user.id, videoLinks[i - 1]);
+        } else {
+            j++;
+            return returnInputAccMimetype(file, req.user.id, pdfLinks[j - 1]);
+        }
+    });
 
-    //     //upload all files
-    //     await Promise.all(
-    //         inputs.map((input) => s3.send(new PutObjectCommand(input)))
-    //     );
-    //     res.status(200).json({
-    //         status: "Success",
-    //         message: "Successfully added new Folder",
-    //     });
-    // } else {
-    //     throw new AppError(
-    //         "Chapter Already Exist, please create another or editFolder",
-    //         407
-    //     );
-
+    //upload all files
+    await Promise.all(
+        inputs.map((input) => s3.send(new PutObjectCommand(input)))
+    );
     res.status(200).json({
         status: "Success",
         message: "Successfully added new Folder",
     });
-    // }
 });
 
 //3:) create brand new course:
@@ -151,6 +136,7 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     const thumbNailKey = `${Date.now()}-${req.file.originalname}`;
 
     const teacherID = req.user.id;
+
     const doc = await prisma.course.create({
         data: {
             ...req.body,
@@ -172,15 +158,15 @@ const createNewCourse = catchAsync(async (req, res, next) => {
 
     // cloud work:
     // create a new course bucket
-    // await createBucket({ Bucket: bucketName });
+    await createBucket({ Bucket: teacherID });
 
-    // // upload thumbnail in s3
-    // const command = new PutObjectCommand({
-    //     Bucket: bucketName,
-    //     Key: thumbnailKey,
-    //     Body: req.file.buffer,
-    // });
-    // await s3.send(command);
+    // upload thumbnail in s3
+    const command = new PutObjectCommand({
+        Bucket: teacherID,
+        Key: thumbNailKey,
+        Body: req.file.buffer,
+    });
+    await s3.send(command);
 
     res.status(200).json({
         status: "success",
