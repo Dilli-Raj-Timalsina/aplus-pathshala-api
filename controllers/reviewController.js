@@ -1,5 +1,30 @@
-// const Course = require("./../models/courseSchema");
-// const Review = require("./../models/reviewSchema");
+const prisma = require("./../prisma/prismaClientExport");
+const catchAsync = require("../errors/catchAsync");
+
+const writeReview = catchAsync(async (req, res, next) => {
+    const { courseId, userId, rating } = req.body;
+    const doc = await prisma.review.create({
+        data: {
+            rating: rating,
+            userId: userId,
+            courseId: courseId,
+        },
+    });
+
+    // prisma.course.update({
+    //     where: {
+    //         id: courseId,
+    //     },
+    //     data: {
+    //         review: {
+    //             connect: {
+    //                 id: doc.id,
+    //             },
+    //         },
+    //     },
+    // });
+    res.end("review successful");
+});
 
 // const writeReview = async (req, res, next) => {
 
@@ -22,4 +47,4 @@
 
 //     res.end("review successful");
 // };
-// module.exports = { writeReview };
+module.exports = { writeReview };

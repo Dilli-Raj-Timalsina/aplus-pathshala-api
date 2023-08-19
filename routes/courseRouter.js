@@ -32,7 +32,11 @@ router.route("/getCourseMetaData").post(getCourseMetaData);
 
 // Routes for deleting courses
 
-router.route("/deleteFolder").post(deleteEntireFolder);
-router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
+// router.route("/deleteFolder").post(deleteEntireFolder);
+// router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
+
+//Review Routes
+const { writeReview } = require("./../controllers/reviewController");
+router.route("/writeReview").post(writeReview);
 
 module.exports = router;

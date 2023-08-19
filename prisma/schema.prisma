@@ -17,7 +17,7 @@ model User {
   role      Role     @default(user)
   courses   Course[] @relation(fields: [courseIds], references: [id])
   courseIds String[] @db.ObjectId
-  review    String[] @db.ObjectId
+  review    Review?
 }
 
 model Course {
@@ -36,6 +36,7 @@ model Course {
   content      Folder[]
   userIds      String[]  @db.ObjectId
   users        User[]    @relation(fields: [userIds], references: [id])
+  review       Review[]
 }
 
 model Folder {
@@ -59,4 +60,14 @@ enum Role {
 model Token {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
+}
+
+model Review {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  rating   Int
+  text     String?
+  user     User    @relation(fields: [userId], references: [id])
+  userId   String  @unique @db.ObjectId
+  course   Course? @relation(fields: [courseId], references: [id])
+  courseId String? @db.ObjectId
 }
