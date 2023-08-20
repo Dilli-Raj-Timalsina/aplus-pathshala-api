@@ -15,13 +15,7 @@ app.use(
         credentials: true,
     })
 );
-app.get("/", async (req, res, next) => {
-    const currentUser = await prisma.user.findFirst({
-        where: { name: "dilli" },
-    });
-    console.log(currentUser);
-    res.end("okok");
-});
+
 // Access-Control-Allow-Origin *
 // a+pathshala.com, front-end natours.com
 // app.use(cors({
