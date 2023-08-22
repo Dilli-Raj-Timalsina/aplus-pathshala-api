@@ -9,7 +9,7 @@ process.on("uncaughtException", (err) => {
 
 //setting dotenv file in our server
 require("dotenv").config({ path: __dirname + "/.env" });
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 //MongoDB local Database Connection:
 try {
