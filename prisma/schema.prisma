@@ -24,12 +24,12 @@ model Course {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   subTitle     String
-  duration     String
+  duration     String?
   language     String
   price        String
-  requirements String[]
+  requirements String
   description  String
-  categories   String
+  category     String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
   thumbNail    String?

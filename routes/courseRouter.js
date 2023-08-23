@@ -14,16 +14,29 @@ const {
     getCourseMetaData,
     getFile,
 } = require("../controllers/getCourseController");
-const { generalProtect } = require("../controllers/userAuthController");
+const {
+    generalProtect,
+    protectTeacher,
+} = require("../controllers/userAuthController");
 
 // Routes for creating courses : only for role:"teacher"
 // router.route("/editFolder").post(generalProtect, editFolder);
 router
     .route("/uploadFolder")
-    .post(generalProtect, upload.array("binary", 15), uploadChapter);
+    .post(
+        generalProtect,
+        protectTeacher,
+        upload.array("binary", 15),
+        uploadChapter
+    );
 router
     .route("/createCourse")
-    .post(generalProtect, upload.single("binary"), createNewCourse);
+    .post(
+        generalProtect,
+        protectTeacher,
+        upload.single("binary"),
+        createNewCourse
+    );
 
 // Routes for getting courses
 router.route("/getFile").post(getFile);

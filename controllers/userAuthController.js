@@ -13,7 +13,7 @@ const prisma = require("./../prisma/prismaClientExport");
 const signToken = async (user) => {
     const payload = {
         email: user.email,
-        _id: user._id,
+        id: user.id,
     };
     return await jwt.sign(payload, process.env.SECRET, {
         expiresIn: process.env.EXPIRES_IN,
@@ -33,11 +33,12 @@ const createSendToken = async (user, statusCode, res) => {
     if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
     res.cookie("jwt", token, cookieOptions);
-    const { id, name, email } = user;
+    const { id, name, email, role } = user;
     const userProfile = {
         id,
         name,
         email,
+        role,
     };
 
     res.status(statusCode).json({
@@ -56,8 +57,7 @@ const generalProtect = catchAsync(async (req, res, next) => {
     ) {
         token = req.headers.authorization.split(" ")[1];
     }
-    console.log("hey");
-    console.log(token);
+
     if (!token) {
         return next(
             new AppError(
@@ -69,10 +69,12 @@ const generalProtect = catchAsync(async (req, res, next) => {
 
     // b) Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.SECRET);
-    console.log(decoded);
+
     // c) Check if user still exists
-    const currentUser = await prisma.user.findFirst({ _id: decoded._id });
-    console.log(currentUser);
+    const currentUser = await prisma.user.findFirst({
+        where: { id: decoded.id },
+    });
+
     if (!currentUser) {
         return next(
             new AppError(
@@ -89,7 +91,8 @@ const generalProtect = catchAsync(async (req, res, next) => {
 //4:) protect unauthorized teacher from  courses
 const protectTeacher = catchAsync(async (req, res, next) => {
     const currentUser = req.user;
-    if (currentUser.role != "teacher") {
+    console.log(currentUser);
+    if (currentUser.role !== "teacher") {
         throw new AppError(
             "You are not a teacher, create a teacher account",
             401
@@ -101,33 +104,20 @@ const protectTeacher = catchAsync(async (req, res, next) => {
     next();
 });
 
-// //5:) protect unauthorized student from  courses
-// const protectStudent = catchAsync(async (req, res, next) => {
-//     const currentUser = req.user;
-//     if (currentUser.role != "student") {
-//         throw new AppError(
-//             "You are not a teacher, create a teacher account",
-//             401
-//         );
-//     }
-//     // GRANT ACCESS TO PROTECTED ROUTE
-//     req.user = currentUser;
-//     next();
-// });
-
 //6:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
     //check whether user already exist or not/ duplicate email
     if (await prisma.user.findFirst({ where: { email: req.body.email } })) {
         throw new AppError("User Already Exist with this Email", 409);
     }
-    let { name, email, password } = req.body;
+    let { name, email, password, role } = req.body;
     password = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
         data: {
             name,
             email,
             password,
+            role,
         },
     });
 

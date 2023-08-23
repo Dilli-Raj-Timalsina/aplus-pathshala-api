@@ -132,19 +132,19 @@ const uploadChapter = catchAsync(async (req, res, next) => {
 //3:) create brand new course:
 const createNewCourse = catchAsync(async (req, res, next) => {
     //database work:
-    //create new course in database with thumbnail reference to s3
+    // create new course in database with thumbnail reference to s3
     const thumbNailKey = `${Date.now()}-${req.file.originalname}`;
-
     const teacherID = req.user.id;
 
     const doc = await prisma.course.create({
         data: {
             ...req.body,
+            price: req.body.price,
             thumbNail: thumbNailKey,
         },
     });
 
-    // connect userIds and CourseIds
+    // connect userIds and CourseId
     const op = await prisma.user.update({
         where: { id: teacherID },
         data: {
@@ -170,7 +170,6 @@ const createNewCourse = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: "success",
-        doc,
         op,
     });
 });
