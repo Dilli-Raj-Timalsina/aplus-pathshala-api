@@ -27,21 +27,21 @@ const returnInputAccMimetype = (file, bucketName, key) => {
     }
 };
 
-//return true if there is content with folderName exist
-// const doesExist = async (bucketName, folderName) => {
+//return true if there is content with chapterName exist
+// const doesExist = async (bucketName, chapterName) => {
 //     return !!(await Course.findOne({
 //         bucketName: bucketName,
-//         "content.folderName": folderName,
+//         "content.chapterName": chapterName,
 //     }));
 // };
-// const doesExist = async (bucketName, folderName) => {
+// const doesExist = async (bucketName, chapterName) => {
 //     return !!(await prisma.course.findFirst({
 //         where: {
 //             bucketName: bucketName,
 //             include: {
 //                 content: {
 //                     where: {
-//                         folderName: folderName,
+//                         chapterName: chapterName,
 //                     },
 //                 },
 //             },
@@ -53,44 +53,41 @@ const returnInputAccMimetype = (file, bucketName, key) => {
 //2:) Uploads multiple files to the specified folder in the corresponding bucket/course
 const uploadChapter = catchAsync(async (req, res, next) => {
     //database work:
-    const courseId = (await prisma.user.findFirst({})).courseIds[0];
-    console.log(courseId);
+
+    const courseId = (
+        await prisma.user.findFirst({ where: { id: req.user.id } })
+    ).courseIds[0];
+
     //extract all data field related to folder/folderSchema
-    let { folderName, folderTitle, free } = req.body;
+    let { chapterName, chapterTitle } = req.body;
     console.log("-----------------------------------------------------");
 
     let videoTitles = [];
     let pdfFileTitles = [];
     let videoLinks = [];
     let pdfLinks = [];
-    let isFree = [];
 
     //extract and fill videotitle,videolinks,pdftitle, pdflink and isFree from req.files,
     //It helps to keep reference of s3 object in database for future query
     req.files.forEach((file) => {
         if (file.mimetype == "video/mp4") {
-            //check if video is free or not
-            if (free == true) {
-                isFree.push(true);
-            } else {
-                isFree.push(false);
-            }
             //add video titles
             videoTitles.push(file.originalname);
             //add video links/keys:
-            videoLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
+            videoLinks.push(
+                `${chapterName}/${Date.now()}-${file.originalname}`
+            );
         } else {
             pdfFileTitles.push(file.originalname);
-            pdfLinks.push(`${folderName}/${Date.now()}-${file.originalname}`);
+            pdfLinks.push(`${chapterName}/${Date.now()}-${file.originalname}`);
         }
     });
 
-    const createdFolder = await prisma.folder.create({
+    const createdCourse = await prisma.chapter.create({
         data: {
-            folderName: folderName,
-            folderTitle: folderTitle,
+            chapterName: chapterName,
+            chapterTitle: chapterTitle,
             videoTitles: videoTitles,
-            isFree: isFree,
             pdfFileTitles: pdfFileTitles,
             videoLinks: videoLinks,
             pdfLinks: pdfLinks,
@@ -101,7 +98,7 @@ const uploadChapter = catchAsync(async (req, res, next) => {
         where: { id: courseId },
         data: {
             content: {
-                connect: { id: createdFolder.id },
+                connect: { id: createdCourse.id },
             },
         },
     });
@@ -123,9 +120,10 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     await Promise.all(
         inputs.map((input) => s3.send(new PutObjectCommand(input)))
     );
+
     res.status(200).json({
         status: "Success",
-        message: "Successfully added new Folder",
+        createdCourse,
     });
 });
 

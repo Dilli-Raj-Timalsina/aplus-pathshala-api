@@ -13,6 +13,7 @@ const {
     getAllCourses,
     getCourseMetaData,
     getFile,
+    getAllChapters,
 } = require("../controllers/getCourseController");
 const {
     generalProtect,
@@ -22,7 +23,7 @@ const {
 // Routes for creating courses : only for role:"teacher"
 // router.route("/editFolder").post(generalProtect, editFolder);
 router
-    .route("/uploadFolder")
+    .route("/uploadChapter")
     .post(
         generalProtect,
         protectTeacher,
@@ -39,9 +40,12 @@ router
     );
 
 // Routes for getting courses
-router.route("/getFile").post(getFile);
-router.route("/getAllCourses").get(getAllCourses);
-router.route("/getCourseMetaData").post(getCourseMetaData);
+router.route("/getFile").post(generalProtect, getFile);
+router.route("/getAllCourses").get(generalProtect, getAllCourses);
+router.route("/getCourseMetaData").post(generalProtect, getCourseMetaData);
+router
+    .route("/getAllChapters")
+    .get(generalProtect, protectTeacher, getAllChapters);
 
 // Routes for deleting courses
 

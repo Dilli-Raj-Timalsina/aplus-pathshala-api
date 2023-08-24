@@ -91,7 +91,6 @@ const generalProtect = catchAsync(async (req, res, next) => {
 //4:) protect unauthorized teacher from  courses
 const protectTeacher = catchAsync(async (req, res, next) => {
     const currentUser = req.user;
-    console.log(currentUser);
     if (currentUser.role !== "teacher") {
         throw new AppError(
             "You are not a teacher, create a teacher account",

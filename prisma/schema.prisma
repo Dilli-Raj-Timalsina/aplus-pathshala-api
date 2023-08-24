@@ -33,23 +33,22 @@ model Course {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
   thumbNail    String?
-  content      Folder[]
+  content      Chapter[]
   userIds      String[]  @db.ObjectId
   users        User[]    @relation(fields: [userIds], references: [id])
   review       Review[]
 }
 
-model Folder {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  folderName    String
-  folderTitle   String
+model Chapter {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  chapterName   String
+  chapterTitle  String
   pdfFileTitles String[]
   videoTitles   String[]
   videoLinks    String[]
   pdfLinks      String[]
-  isFree        Boolean[]
-  Course        Course?   @relation(fields: [courseId], references: [id])
-  courseId      String?   @db.ObjectId
+  Course        Course?  @relation(fields: [courseId], references: [id])
+  courseId      String?  @db.ObjectId
 }
 
 enum Role {

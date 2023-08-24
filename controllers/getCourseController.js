@@ -9,19 +9,20 @@ const { GetObjectCommand } = require("@aws-sdk/client-s3");
 
 //1:) get signed url of particular bucket-folder-key
 const getFile = catchAsync(async (req, res, next) => {
-    const { bucketName, folderName, keyName } = req.body;
+    const bucketName = req.user.id;
+    const { fileLink } = req.body;
     let input;
 
     if (keyName.split(".")[1] === "mp4") {
         input = {
             Bucket: bucketName,
-            Key: `${folderName}/${keyName}`,
+            Key: `${fileLink}`,
             ResponseContentType: "video/mp4",
         };
     } else {
         input = {
             Bucket: bucketName,
-            Key: `${folderName}/${keyName}`,
+            Key: `${fileLink}`,
         };
     }
     const command = new GetObjectCommand(input);
@@ -34,11 +35,9 @@ const getFile = catchAsync(async (req, res, next) => {
 
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
-    console.log(req.body.id);
-
     const doc = await prisma.course.findFirst({
         where: {
-            id: req.body.id,
+            id: req.user.courseIds[0],
         },
     });
     if (!doc) {
@@ -64,8 +63,24 @@ const getAllCourses = catchAsync(async (req, res, next) => {
     });
 });
 
+const getAllChapters = catchAsync(async (req, res, next) => {
+    //a:) find courseId from req.user
+    const courseId = req.user.courseIds[0];
+    //b:)get all chapter related to courseId,
+    const allChapter = await prisma.chapter.findMany({
+        where: {
+            courseId: courseId,
+        },
+    });
+    res.status(200).json({
+        status: "success",
+        allChapter,
+    });
+});
+
 module.exports = {
     getCourseMetaData,
     getAllCourses,
     getFile,
+    getAllChapters,
 };
