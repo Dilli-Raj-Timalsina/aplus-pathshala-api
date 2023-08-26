@@ -13,7 +13,7 @@ const getFile = catchAsync(async (req, res, next) => {
     const { fileLink } = req.body;
     let input;
 
-    if (keyName.split(".")[1] === "mp4") {
+    if (fileLink.split(".")[1] === "mp4") {
         input = {
             Bucket: bucketName,
             Key: `${fileLink}`,
@@ -26,7 +26,7 @@ const getFile = catchAsync(async (req, res, next) => {
         };
     }
     const command = new GetObjectCommand(input);
-    const url = await getSignedUrl(s3, command, { expiresIn: 36000 });
+    const url = await getSignedUrl(s3, command, { expiresIn: 360000 });
     res.status(200).json({
         status: "sucess",
         ouput: url,
@@ -35,9 +35,10 @@ const getFile = catchAsync(async (req, res, next) => {
 
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
+    const courseId = req.body.courseId;
     const doc = await prisma.course.findFirst({
         where: {
-            id: req.user.courseIds[0],
+            id: courseId,
         },
     });
     if (!doc) {
@@ -57,6 +58,7 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
 const getAllCourses = catchAsync(async (req, res, next) => {
     //return all course accoding to pagination:
     const courses = await prisma.course.findMany();
+    const modifiedCoursesInfo = courses.map((current, index) => {});
     res.status(200).json({
         status: "sucess",
         courses,

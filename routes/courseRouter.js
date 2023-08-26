@@ -41,19 +41,13 @@ router
 
 // Routes for getting courses
 router.route("/getFile").post(generalProtect, getFile);
-router.route("/getAllCourses").get(generalProtect, getAllCourses);
-router.route("/getCourseMetaData").post(generalProtect, getCourseMetaData);
-router
-    .route("/getAllChapters")
-    .get(generalProtect, protectTeacher, getAllChapters);
+router.route("/getAllCourses").get(getAllCourses);
+router.route("/getCourseMetaData").post(getCourseMetaData);
+router.route("/getAllChapters").get(getAllChapters);
 
 // Routes for deleting courses
 
 // router.route("/deleteFolder").post(deleteEntireFolder);
 // router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
-
-//Review Routes
-const { writeReview } = require("./../controllers/reviewController");
-router.route("/writeReview").post(writeReview);
 
 module.exports = router;

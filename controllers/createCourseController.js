@@ -1,6 +1,8 @@
 const catchAsync = require("../errors/catchAsync");
 
 const s3 = require("../awsConfig/credential");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
 const prisma = require("./../prisma/prismaClientExport");
 
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
@@ -131,14 +133,24 @@ const uploadChapter = catchAsync(async (req, res, next) => {
 const createNewCourse = catchAsync(async (req, res, next) => {
     //database work:
     // create new course in database with thumbnail reference to s3
-    const thumbNailKey = `${Date.now()}-${req.file.originalname}`;
     const teacherID = req.user.id;
+    const thumbNailKey = `${Date.now()}-${req.file.originalname}`;
+
+    //get signedurl which has infinite expiry date for storing thumnail
+    const input = {
+        Bucket: teacherID,
+        Key: `${thumbNailKey}`,
+    };
+    const command1 = new GetObjectCommand(input);
+    const url = await getSignedUrl(s3, command1, {});
 
     const doc = await prisma.course.create({
         data: {
             ...req.body,
             price: req.body.price,
-            thumbNail: thumbNailKey,
+            thumbNail: url,
+            tutorName: req.user.name,
+            reviewScore: 4.2,
         },
     });
 

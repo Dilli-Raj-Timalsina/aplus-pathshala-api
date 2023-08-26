@@ -13,11 +13,12 @@ model User {
   email     String   @unique
   password  String
   token     String?
-  contact   Int?
+  contact   Float?
   role      Role     @default(user)
   courses   Course[] @relation(fields: [courseIds], references: [id])
   courseIds String[] @db.ObjectId
   review    Review?
+  cart      String[]
 }
 
 model Course {
@@ -29,6 +30,7 @@ model Course {
   price        String
   requirements String
   description  String
+  tutorName    String
   category     String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
@@ -37,6 +39,7 @@ model Course {
   userIds      String[]  @db.ObjectId
   users        User[]    @relation(fields: [userIds], references: [id])
   review       Review[]
+  reviewScore  Int?
 }
 
 model Chapter {
