@@ -50,6 +50,7 @@ const createSendToken = async (user, statusCode, res) => {
 // 3:) general token leven authentication for both student and teacher
 const generalProtect = catchAsync(async (req, res, next) => {
     // a) Getting token and check of it's there
+
     let token;
     if (
         req.headers.authorization &&

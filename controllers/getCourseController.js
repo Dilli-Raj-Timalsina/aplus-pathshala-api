@@ -35,8 +35,8 @@ const getFile = catchAsync(async (req, res, next) => {
 
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
-    const courseId = req.body.courseId;
-    const doc = await prisma.course.findFirst({
+    const courseId = req.params.id;
+    const course = await prisma.course.findFirst({
         where: {
             id: courseId,
         },
@@ -50,18 +50,47 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: "sucess",
-        doc,
+        course,
     });
 });
 
 //3:) get all the  courses
 const getAllCourses = catchAsync(async (req, res, next) => {
-    //return all course accoding to pagination:
-    const courses = await prisma.course.findMany();
-    const modifiedCoursesInfo = courses.map((current, index) => {});
+    //apply all filter criteria
+    let courses, courseCount;
+    const skipped = req.query.page ? req.query.page * 6 : 0;
+    courseCount = await prisma.course.count({
+        where: {
+            category: req.params.id,
+            reviewScore: { gte: req.query.rating * 1 },
+            isFree: req.query.isFree == "true",
+            duration: {
+                gte: req.query.duration * 1,
+                lte:
+                    req.query.duration * 1 == 0 ? 1000 : req.query.duration * 2,
+            },
+        },
+    });
+    courses = await prisma.course.findMany({
+        //apply pagination
+        skip: skipped,
+        take: 6,
+        where: {
+            category: req.params.id,
+            reviewScore: { gte: req.query.rating * 1 },
+            isFree: req.query.isFree == "true",
+            duration: {
+                gte: req.query.duration * 1,
+                lte:
+                    req.query.duration * 1 == 0 ? 1000 : req.query.duration * 2,
+            },
+        },
+    });
+
     res.status(200).json({
         status: "sucess",
         courses,
+        courseCount,
     });
 });
 
@@ -80,9 +109,21 @@ const getAllChapters = catchAsync(async (req, res, next) => {
     });
 });
 
+const getPopularCourse = catchAsync(async (req, res, next) => {
+    const course = await prisma.course.findMany({
+        where: {
+            reviewScore: { gte: 4 },
+        },
+    });
+    res.status(200).json({
+        status: "success",
+        course,
+    });
+});
 module.exports = {
     getCourseMetaData,
     getAllCourses,
     getFile,
     getAllChapters,
+    getPopularCourse,
 };

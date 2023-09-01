@@ -52,7 +52,23 @@ const getCartItems = catchAsync(async (req, res, next) => {
     });
     res.status(200).json({
         status: "succes",
+
         cart: doc.cart,
+    });
+});
+
+const getCartData = catchAsync(async (req, res, next) => {
+    const doc = await prisma.course.findMany({
+        where: {
+            id: {
+                in: req.body.cart,
+            },
+        },
+    });
+
+    res.status(200).json({
+        status: "success",
+        doc,
     });
 });
 // const writeReview = async (req, res, next) => {
@@ -76,4 +92,4 @@ const getCartItems = catchAsync(async (req, res, next) => {
 
 //     res.end("review successful");
 // };
-module.exports = { writeReview, getCartItems, updateCart };
+module.exports = { writeReview, getCartItems, updateCart, getCartData };

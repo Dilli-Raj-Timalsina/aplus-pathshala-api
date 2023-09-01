@@ -147,10 +147,11 @@ const createNewCourse = catchAsync(async (req, res, next) => {
     const doc = await prisma.course.create({
         data: {
             ...req.body,
-            price: req.body.price,
+            price: req.body.price * 1,
             thumbNail: url,
             tutorName: req.user.name,
-            reviewScore: 4.2,
+            duration: req.body.duration * 1,
+            reviewScore: 2.0,
         },
     });
 
@@ -166,17 +167,17 @@ const createNewCourse = catchAsync(async (req, res, next) => {
         },
     });
 
-    // cloud work:
-    // create a new course bucket
-    await createBucket({ Bucket: teacherID });
+    // // cloud work:
+    // // create a new course bucket
+    // await createBucket({ Bucket: teacherID });
 
-    // upload thumbnail in s3
-    const command = new PutObjectCommand({
-        Bucket: teacherID,
-        Key: thumbNailKey,
-        Body: req.file.buffer,
-    });
-    await s3.send(command);
+    // // upload thumbnail in s3
+    // const command = new PutObjectCommand({
+    //     Bucket: teacherID,
+    //     Key: thumbNailKey,
+    //     Body: req.file.buffer,
+    // });
+    // await s3.send(command);
 
     res.status(200).json({
         status: "success",
@@ -186,6 +187,5 @@ const createNewCourse = catchAsync(async (req, res, next) => {
 
 module.exports = {
     createNewCourse,
-
     uploadChapter,
 };

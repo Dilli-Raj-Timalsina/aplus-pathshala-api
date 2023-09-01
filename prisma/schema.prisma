@@ -25,9 +25,9 @@ model Course {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   subTitle     String
-  duration     String?
+  duration     Float?
   language     String
-  price        String
+  price        Float
   requirements String
   description  String
   tutorName    String
@@ -39,7 +39,8 @@ model Course {
   userIds      String[]  @db.ObjectId
   users        User[]    @relation(fields: [userIds], references: [id])
   review       Review[]
-  reviewScore  Int?
+  reviewScore  Float?
+  isFree       Boolean   @default(false)
 }
 
 model Chapter {
