@@ -17,6 +17,7 @@ const sendMailNormal = async (options) => {
                 rejectUnauthorized: false,
             },
         });
+
         // 2) Define the email options
         const message = {
             from: "Dilli Raj Timalsina <dillirajtimalsina354@gmail.com>",
@@ -33,7 +34,7 @@ const sendMailNormal = async (options) => {
     }
 };
 
-const sendMailPayMent = async (options, file) => {
+const sendMailPayment = async (options, file) => {
     try {
         // 1) Create a transporter
         const transporter = nodemailer.createTransport({
@@ -76,4 +77,4 @@ const sendMailPayMent = async (options, file) => {
 };
 
 //export only sendMail function
-module.exports = { sendMailNormal, sendMailPayMent };
+module.exports = { sendMailNormal, sendMailPayment };

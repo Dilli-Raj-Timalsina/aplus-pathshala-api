@@ -1,5 +1,6 @@
 const prisma = require("./../prisma/prismaClientExport");
 const catchAsync = require("../errors/catchAsync");
+const { sendMailNormal } = require("./../utils/email");
 
 const writeReview = catchAsync(async (req, res, next) => {
     const { courseId, userId, rating } = req.body;
@@ -11,18 +12,18 @@ const writeReview = catchAsync(async (req, res, next) => {
         },
     });
 
-    // prisma.course.update({
-    //     where: {
-    //         id: courseId,
-    //     },
-    //     data: {
-    //         review: {
-    //             connect: {
-    //                 id: doc.id,
-    //             },
-    //         },
-    //     },
-    // });
+    prisma.course.update({
+        where: {
+            id: courseId,
+        },
+        data: {
+            review: {
+                connect: {
+                    id: doc.id,
+                },
+            },
+        },
+    });
     res.end("review successful");
 });
 
@@ -71,25 +72,38 @@ const getCartData = catchAsync(async (req, res, next) => {
         totalPrice,
     });
 });
-// const writeReview = async (req, res, next) => {
 
-//     const { bucketName } = req.body;
-//     const review = {
-//         rating: "5",
-//         comment: "Thi is comment",
-//     };
+const contactUs = catchAsync(async (req, res, next) => {
+    //extract all user Information:
+    const { name, email, subject, message, contact } = req.body;
 
-//     const doc = await Course.findOneAndUpdate(
-//         {
-//             bucketName: bucketName,
-//         },
-//         {
-//             $push: {
-//                 review: review,
-//             },
-//         }
-//     );
+    //d) preparing credentials to send user an email:
+    const options = {
+        email: email,
+        subject: subject,
+        message: ` 
+          Name : ${name} ,
+          Email :${email} ,
+          contact : ${contact} ,
+          message : ${message},
+         `,
+    };
+    //e) send reset password link to the user's email
+    await sendMailNormal(options);
 
-//     res.end("review successful");
-// };
-module.exports = { writeReview, getCartItems, updateCart, getCartData };
+    res.status(200).json({
+        status: "success",
+        message: "email sent Successfully",
+        data: {
+            options,
+        },
+    });
+});
+
+module.exports = {
+    writeReview,
+    getCartItems,
+    updateCart,
+    getCartData,
+    contactUs,
+};
