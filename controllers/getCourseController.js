@@ -120,10 +120,24 @@ const getPopularCourse = catchAsync(async (req, res, next) => {
         course,
     });
 });
+const getPurchasedCourse = catchAsync(async (req, res, next) => {
+    const userId = req.user.Id;
+    const doc = await prisma.course.findMany({
+        where: {
+            id: userId,
+        },
+    });
+    res.status(200).json({
+        status: "success",
+        doc,
+    });
+});
+
 module.exports = {
     getCourseMetaData,
     getAllCourses,
     getFile,
     getAllChapters,
     getPopularCourse,
+    getPurchasedCourse,
 };

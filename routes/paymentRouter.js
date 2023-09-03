@@ -52,6 +52,8 @@ router
     .route("/create-checkout-session")
     .post(express.json(), async (req, res) => {
         const { products, userId, courseIds } = req.body;
+
+        //customer object created for webhook event , it is used for db update
         const customer = await stripe.customers.create({
             metadata: {
                 userId: userId,
@@ -79,8 +81,8 @@ router
             line_items: lineItems,
             mode: "payment",
             customer: customer.id,
-            success_url: "http://localhost:3000/checkout-cart",
-            cancel_url: "http://localhost:3000/",
+            success_url: "http://localhost:3000/checkout-cart/success",
+            cancel_url: "http://localhost:3000/checkout-cart/failed",
         });
 
         res.json({ id: session.id });

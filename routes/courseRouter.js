@@ -15,6 +15,7 @@ const {
     getFile,
     getAllChapters,
     getPopularCourse,
+    getPurchasedCourse,
 } = require("../controllers/getCourseController");
 const {
     generalProtect,
@@ -46,6 +47,7 @@ router.route("/getAllCourses/:id?").get(getAllCourses);
 router.route("/getCourseMetaData/:id?").get(getCourseMetaData);
 router.route("/getAllChapters").get(getAllChapters);
 router.route("/getPopularCourse").get(getPopularCourse);
+router.route("/getPurchasedCourse").get(generalProtect, getPurchasedCourse);
 
 // Routes for deleting courses
 
