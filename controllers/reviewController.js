@@ -28,13 +28,11 @@ const writeReview = catchAsync(async (req, res, next) => {
 
 const updateCart = catchAsync(async (req, res, next) => {
     const userId = req.user.id;
-    const courseId = req.body.courseId;
+    const courseList = req.body.courseList;
     await prisma.user.update({
         where: { id: userId },
         data: {
-            cart: {
-                push: courseId,
-            },
+            cart: courseList,
         },
     });
     res.status(200).json({
@@ -65,10 +63,12 @@ const getCartData = catchAsync(async (req, res, next) => {
             },
         },
     });
+    const totalPrice = doc.reduce((total, course) => total + course.price, 0);
 
     res.status(200).json({
         status: "success",
         doc,
+        totalPrice,
     });
 });
 // const writeReview = async (req, res, next) => {

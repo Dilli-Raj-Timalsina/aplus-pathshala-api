@@ -30,10 +30,6 @@ const globalErrorHandler = require("./errors/errorController");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-//making req.body available:
-const bodyParser = require("body-parser");
-app.use(bodyParser.json());
-
 // By default, $ and . characters are removed completely and used for query injection protection:
 const mongoSanitize = require("express-mongo-sanitize");
 app.use(mongoSanitize());
@@ -56,6 +52,12 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
+const paymentRouter = require("./routes/paymentRouter");
+app.use("/api", paymentRouter);
+//making req.body available:
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+
 // passport configuration:
 const passport = require("passport");
 require("./authSetupGoogle/passport-google");
@@ -67,7 +69,6 @@ const googleAuthRouter = require("./routes/googleAuthRouter");
 const userRouter = require("./routes/userRouter");
 const courseRouter = require("./routes/courseRouter");
 const reviewRouter = require("./routes/reviewRouter");
-
 app.use(googleAuthRouter);
 
 app.use("/api/v1/user", userRouter);
