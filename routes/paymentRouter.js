@@ -3,7 +3,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const express = require("express");
 const prisma = require("./../prisma/prismaClientExport");
 
-//stripe webhook for handeling
+//stripe webhook for handeling payment success or failure
 router.post(
     "/webhook",
     express.raw({ type: "application/json" }),
