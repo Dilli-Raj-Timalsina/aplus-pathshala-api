@@ -1,14 +1,17 @@
 const router = require("express").Router();
 const upload = require("./../awsConfig/multerSetup"); // Multer setup for file uploads
 
-//requiring all controller functions:
+// course upload route controller
 const {
-    // editFolder,
     uploadChapter,
     createNewCourse,
 } = require("../controllers/createCourseController");
+
+//course delete route controller
 const { deleteEntireFolder } = require("../controllers/deleteCourseController");
 const { deleteAllBucketAtOnce } = require("./../awsConfig/bucketControl");
+
+//course consume/get route controller
 const {
     getAllCourses,
     getCourseMetaData,
@@ -17,13 +20,14 @@ const {
     getPopularCourse,
     getPurchasedCourse,
 } = require("../controllers/getCourseController");
+
+//general authentication route controller
 const {
     generalProtect,
     protectTeacher,
 } = require("../controllers/userAuthController");
 
-// Routes for creating courses : only for role:"teacher"
-// router.route("/editFolder").post(generalProtect, editFolder);
+//course upload
 router
     .route("/uploadChapter")
     .post(
@@ -41,7 +45,7 @@ router
         createNewCourse
     );
 
-// Routes for getting courses
+// course download
 router.route("/getFile").post(generalProtect, getFile);
 router.route("/getAllCourses/:id?").get(getAllCourses);
 router.route("/getCourseMetaData/:id?").get(getCourseMetaData);
@@ -50,7 +54,6 @@ router.route("/getPopularCourse").get(getPopularCourse);
 router.route("/getPurchasedCourse").get(generalProtect, getPurchasedCourse);
 
 // Routes for deleting courses
-
 // router.route("/deleteFolder").post(deleteEntireFolder);
 // router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
 

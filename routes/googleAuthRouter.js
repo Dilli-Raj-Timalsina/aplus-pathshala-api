@@ -13,14 +13,13 @@ router.get(
 router.get(
     "/auth/google/callback",
     passport.authenticate("google", {
-        failureRedirect: "http://127.0.0.1:3000/failed",
+        failureRedirect: "https://www.apluspathshala.com/",
         session: false,
     }),
     async (req, res) => {
-        //generating token and setting it in cookie
         const token = await signToken({
             email: req.user.email,
-            _id: req.user._id,
+            id: req.user.id,
         });
         const cookieOptions = {
             expires: new Date(
@@ -33,15 +32,8 @@ router.get(
         //setting cookie
         res.cookie("jwt", token, cookieOptions);
         //setting profile information
-        res.user = {
-            token: "Bearer " + token,
-            name: req.user.name,
-            email: req.user.email,
-            profilePicture: req.user.profilePicture,
-            contactNumber: req.user.contact,
-        };
-        //redirecting it to homepage
-        res.redirect("https://a-pathshala-service-1.vercel.app/");
+
+        res.redirect(`http://localhost:3000/OAuthRedirecting?token=${token}`);
     }
 );
 

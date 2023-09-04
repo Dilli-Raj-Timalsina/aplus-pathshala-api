@@ -52,8 +52,10 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
+//all payment related routes
 const paymentRouter = require("./routes/paymentRouter");
 app.use("/api", paymentRouter);
+
 //making req.body available:
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
@@ -61,7 +63,6 @@ app.use(bodyParser.json());
 // passport configuration:
 const passport = require("passport");
 require("./authSetupGoogle/passport-google");
-// require("./authSetupGoogle/assport-jwt");
 app.use(passport.initialize());
 
 //Routes:

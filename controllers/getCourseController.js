@@ -41,7 +41,7 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
             id: courseId,
         },
     });
-    if (!doc) {
+    if (!course) {
         throw new AppError(
             "cannot find such course ,please try correct courseID",
             404
@@ -94,6 +94,7 @@ const getAllCourses = catchAsync(async (req, res, next) => {
     });
 });
 
+//4:) get all chapters
 const getAllChapters = catchAsync(async (req, res, next) => {
     //a:) find courseId from req.user
     const courseId = req.user.courseIds[0];
@@ -109,6 +110,7 @@ const getAllChapters = catchAsync(async (req, res, next) => {
     });
 });
 
+//5:) get all popular  courses
 const getPopularCourse = catchAsync(async (req, res, next) => {
     const course = await prisma.course.findMany({
         where: {
@@ -120,6 +122,8 @@ const getPopularCourse = catchAsync(async (req, res, next) => {
         course,
     });
 });
+
+//6:) get all purchased course
 const getPurchasedCourse = catchAsync(async (req, res, next) => {
     const userId = req.user.Id;
     const doc = await prisma.course.findMany({

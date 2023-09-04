@@ -1,6 +1,5 @@
 // Multer is a node.js middleware for handling multipart/form-data
 const multer = require("multer");
-const AppError = require("../errors/appError");
 
 // /*
 // setup for Disk storage/to store on your current pc/machine

@@ -1,6 +1,5 @@
 const AppError = require("../errors/appError");
 const nodemailer = require("nodemailer");
-const catchAsync = require("../errors/catchAsync");
 const { Readable } = require("stream");
 require("dotenv").config();
 
@@ -76,5 +75,4 @@ const sendMailPayment = async (options, file) => {
     }
 };
 
-//export only sendMail function
 module.exports = { sendMailNormal, sendMailPayment };
