@@ -27,7 +27,7 @@ const {
     protectTeacher,
 } = require("../controllers/userAuthController");
 
-//course upload
+//create course
 router
     .route("/uploadChapter")
     .post(
@@ -46,15 +46,15 @@ router
     );
 
 // course download
-router.route("/getFile").post(generalProtect, getFile);
+router.route("/getFile").post(getFile);
 router.route("/getAllCourses/:id?").get(getAllCourses);
 router.route("/getCourseMetaData/:id?").get(getCourseMetaData);
-router.route("/getAllChapters").get(getAllChapters);
+router.route("/getAllChapters").post(getAllChapters);
 router.route("/getPopularCourse").get(getPopularCourse);
 router.route("/getPurchasedCourse").get(generalProtect, getPurchasedCourse);
 
 // Routes for deleting courses
-// router.route("/deleteFolder").post(deleteEntireFolder);
-// router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
+router.route("/deleteFolder").post(deleteEntireFolder);
+router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
 
 module.exports = router;

@@ -19,7 +19,7 @@ model User {
   courseIds      String[] @db.ObjectId
   review         Review?
   cart           String[]
-  profilePicture String?  @default("none")
+  profilePicture String?
   bio            String?
 }
 
@@ -42,7 +42,7 @@ model Course {
   users        User[]    @relation(fields: [userIds], references: [id])
   review       Review[]
   reviewScore  Float?
-  isFree       Boolean   @default(false)
+  isFree       Boolean
 }
 
 model Chapter {

@@ -14,17 +14,17 @@ const {
 const deleteEntireFolder = async (req, res, next) => {
     const { bucketName, folderName } = req.body;
     //database work:
-    const doc = await Course.findOneAndUpdate(
-        {
-            bucketName: bucketName,
-            content: { $elemMatch: { folderName: folderName } },
-        },
-        {
-            //It removes that content which has folderName="xyz"here folderName variable
-            $pull: { content: { folderName: folderName } },
-        },
-        { new: true }
-    );
+    // const doc = await Course.findOneAndUpdate(
+    //     {
+    //         bucketName: bucketName,
+    //         content: { $elemMatch: { folderName: folderName } },
+    //     },
+    //     {
+    //         //It removes that content which has folderName="xyz"here folderName variable
+    //         $pull: { content: { folderName: folderName } },
+    //     },
+    //     { new: true }
+    // );
     //remove all parts from DBS
 
     //cloud work:

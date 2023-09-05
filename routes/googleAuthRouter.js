@@ -9,6 +9,9 @@ router.get(
         scope: ["email", "profile"],
     })
 );
+router.get("/ok", (req, res) => {
+    res.end("data");
+});
 
 router.get(
     "/auth/google/callback",

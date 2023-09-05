@@ -54,15 +54,10 @@ const returnInputAccMimetype = (file, bucketName, key) => {
 
 //2:) Uploads multiple files to the specified folder in the corresponding bucket/course
 const uploadChapter = catchAsync(async (req, res, next) => {
-    //database work:
-
-    const courseId = (
-        await prisma.user.findFirst({ where: { id: req.user.id } })
-    ).courseIds[0];
+    // database work:
 
     //extract all data field related to folder/folderSchema
-    let { chapterName, chapterTitle } = req.body;
-    console.log("-----------------------------------------------------");
+    let { chapterName, chapterTitle, courseId } = req.body;
 
     let videoTitles = [];
     let pdfFileTitles = [];
@@ -111,10 +106,10 @@ const uploadChapter = catchAsync(async (req, res, next) => {
     const inputs = req.files.map((file) => {
         if (file.mimetype == "video/mp4") {
             i++;
-            return returnInputAccMimetype(file, req.user.id, videoLinks[i - 1]);
+            return returnInputAccMimetype(file, courseId, videoLinks[i - 1]);
         } else {
             j++;
-            return returnInputAccMimetype(file, req.user.id, pdfLinks[j - 1]);
+            return returnInputAccMimetype(file, courseId, pdfLinks[j - 1]);
         }
     });
 
@@ -132,56 +127,68 @@ const uploadChapter = catchAsync(async (req, res, next) => {
 //3:) create brand new course:
 const createNewCourse = catchAsync(async (req, res, next) => {
     //database work:
-    // create new course in database with thumbnail reference to s3
+
     const teacherID = req.user.id;
+    // create new course in database with thumbnail reference to s3
     const thumbNailKey = `${Date.now()}-${req.file.originalname}`;
 
-    //get signedurl which has infinite expiry date for storing thumnail
-    const input = {
-        Bucket: teacherID,
-        Key: `${thumbNailKey}`,
-    };
-    const command1 = new GetObjectCommand(input);
-    const url = await getSignedUrl(s3, command1, {});
-
-    const doc = await prisma.course.create({
+    const newCourse = await prisma.course.create({
         data: {
             ...req.body,
             price: req.body.price * 1,
-            thumbNail: url,
+            thumbNail: "",
             tutorName: req.user.name,
             duration: req.body.duration * 1,
             reviewScore: 2.0,
+            isFree: req.body.isFree == "false" ? false : true,
         },
     });
 
     // connect userIds and CourseId
-    const op = await prisma.user.update({
+    await prisma.user.update({
         where: { id: teacherID },
         data: {
             courses: {
                 connect: {
-                    id: doc.id,
+                    id: newCourse.id,
                 },
             },
         },
     });
 
-    // // cloud work:
-    // // create a new course bucket
-    // await createBucket({ Bucket: teacherID });
+    //get signedurl which has infinite expiry date for storing thumnail
+    const input = {
+        Bucket: newCourse.id,
+        Key: `${thumbNailKey}`,
+    };
+    const command1 = new GetObjectCommand(input);
+    const url = await getSignedUrl(s3, command1, {});
 
-    // // upload thumbnail in s3
-    // const command = new PutObjectCommand({
-    //     Bucket: teacherID,
-    //     Key: thumbNailKey,
-    //     Body: req.file.buffer,
-    // });
-    // await s3.send(command);
+    //update the thumbnail
+    await prisma.course.update({
+        where: {
+            id: newCourse.id,
+        },
+        data: {
+            thumbNail: url,
+        },
+    });
+
+    // cloud work:
+    // create a new course bucket
+    await createBucket({ Bucket: newCourse.id });
+
+    // upload thumbnail in s3
+    const command = new PutObjectCommand({
+        Bucket: newCourse.id,
+        Key: thumbNailKey,
+        Body: req.file.buffer,
+    });
+    await s3.send(command);
 
     res.status(200).json({
         status: "success",
-        op,
+        newCourse,
     });
 });
 

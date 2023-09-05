@@ -9,7 +9,7 @@ const { GetObjectCommand } = require("@aws-sdk/client-s3");
 
 //1:) get signed url of particular bucket-folder-key
 const getFile = catchAsync(async (req, res, next) => {
-    const bucketName = req.user.id;
+    const bucketName = req.body.courseId;
     const { fileLink } = req.body;
     let input;
 
@@ -29,7 +29,7 @@ const getFile = catchAsync(async (req, res, next) => {
     const url = await getSignedUrl(s3, command, { expiresIn: 360000 });
     res.status(200).json({
         status: "sucess",
-        ouput: url,
+        url,
     });
 });
 
@@ -97,7 +97,7 @@ const getAllCourses = catchAsync(async (req, res, next) => {
 //4:) get all chapters
 const getAllChapters = catchAsync(async (req, res, next) => {
     //a:) find courseId from req.user
-    const courseId = req.user.courseIds[0];
+    const courseId = req.body.courseId;
     //b:)get all chapter related to courseId,
     const allChapter = await prisma.chapter.findMany({
         where: {
