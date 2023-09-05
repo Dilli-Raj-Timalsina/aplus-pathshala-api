@@ -104,6 +104,14 @@ const protectTeacher = catchAsync(async (req, res, next) => {
     next();
 });
 
+// //5:) protect unauthorized user from  courses
+// const protectPurchase = catchAsync(async (req, res, next) => {
+//    if(req.user.courseIds.contains())
+
+//     // GRANT ACCESS TO PROTECTED ROUTE
+//     next();
+// });
+
 //6:) signup user based on req.body and return jwt via cookie
 const signupControl = catchAsync(async (req, res) => {
     //check whether user already exist or not/ duplicate email
@@ -241,5 +249,6 @@ module.exports = {
     logoutControl,
     protectTeacher,
     generalProtect,
+
     verifyControl,
 };

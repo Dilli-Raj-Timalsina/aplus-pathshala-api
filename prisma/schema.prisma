@@ -41,7 +41,7 @@ model Course {
   userIds      String[]  @db.ObjectId
   users        User[]    @relation(fields: [userIds], references: [id])
   review       Review[]
-  reviewScore  Float?
+  reviewScore  Float     @default(0)
   isFree       Boolean
 }
 
@@ -70,7 +70,7 @@ model Token {
 model Review {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   rating   Int
-  text     String?
+  text     String
   user     User    @relation(fields: [userId], references: [id])
   userId   String  @unique @db.ObjectId
   course   Course? @relation(fields: [courseId], references: [id])

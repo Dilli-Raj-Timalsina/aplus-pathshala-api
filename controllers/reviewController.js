@@ -1,14 +1,55 @@
 const prisma = require("./../prisma/prismaClientExport");
 const catchAsync = require("../errors/catchAsync");
 const { sendMailNormal } = require("./../utils/email");
+const AppError = require("../errors/appError");
 
 const writeReview = catchAsync(async (req, res, next) => {
-    const { courseId, userId, rating } = req.body;
+    const userId = req.user.id;
+    const { courseId, rating, message } = req.body;
+
+    //purchase protection
+    if (!req.user.courseIds.includes(courseId)) {
+        throw new AppError("please purchase the course first", 404);
+    }
+    const course = await prisma.course.findFirst({
+        where: {
+            id: courseId,
+        },
+    });
+
+    //calculate average review from previous average review
+    const totalStudentReview = (
+        await prisma.review.findMany({
+            where: {
+                courseId: courseId,
+            },
+        })
+    ).length;
+
+    const calcReview =
+        (course.reviewScore * totalStudentReview + rating) /
+        (totalStudentReview + 1);
+    let rounded = parseFloat(calcReview.toFixed(1));
+    if (rounded > 5) {
+        rounded = 5;
+    }
+
+    //update the new average review
+    await prisma.course.update({
+        where: {
+            id: courseId,
+        },
+        data: {
+            reviewScore: rounded,
+        },
+    });
+
     const doc = await prisma.review.create({
         data: {
             rating: rating,
             userId: userId,
             courseId: courseId,
+            text: message,
         },
     });
 
@@ -24,7 +65,7 @@ const writeReview = catchAsync(async (req, res, next) => {
             },
         },
     });
-    res.end("review successful");
+    res.status(200).json({ status: "success", message: "review successful" });
 });
 
 const updateCart = catchAsync(async (req, res, next) => {
