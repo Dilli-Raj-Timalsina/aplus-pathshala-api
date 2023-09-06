@@ -155,9 +155,9 @@ const loginControl = catchAsync(async (req, res) => {
 const forgetControl = catchAsync(async (req, res, next) => {
     //a) check whether user exist or not
     const { email } = req.body;
-    const user = await prisma.user.findFirst({ where: { email: email } });
+    const currUser = await prisma.user.findFirst({ where: { email: email } });
 
-    if (!user) {
+    if (!currUser) {
         throw new AppError("User does not exist");
     }
     //b) generate reset token:
@@ -173,7 +173,7 @@ const forgetControl = catchAsync(async (req, res, next) => {
     //d) preparing credentials to send user an email:
 
     const options = {
-        email: "dillirajtimalsina354@gmail.com",
+        email: email,
         subject: "Reset password A+ pathshala ",
         message: `Your reset OTP is   : ${resetToken}\n
     please do not share it with anybody `,
@@ -191,45 +191,51 @@ const forgetControl = catchAsync(async (req, res, next) => {
 //9:) this is 2nd redirected hit for forgetpassword
 const verifyControl = catchAsync(async (req, res) => {
     //a) getting user reset credential :
-    const { email, token } = req.body;
+    const { email, otp, password } = req.body;
+    console.log(email, otp, password);
 
     //b) if user doesn't exist or token is invalid
     const user = await prisma.user.findFirst({ where: { email: email } });
-    if (!user || !(token == user.token)) {
+    if (!user || !(otp == user.token)) {
         throw new AppError(
             "Invalid or expired token, please reset again!!",
             403
         );
     }
-    //d) change token value to empty string
-    await prisma.user.update({ where: { email: email }, data: { token: "" } });
-    //e) if reset is successful then send success message
+    const random = Math.floor(Math.random() * 9000) + 1000;
+    //c) hash the password and update , also update otp
+    const hash = await bcrypt.hash(password, 10);
+    await prisma.user.update({
+        where: { email: email },
+        data: { password: hash, token: random + "" },
+    });
+
     res.status(200).json({
         status: "success",
         message: "verification has done, change the password now",
     });
 });
 
-//9:) this is 2nd redirected hit for forgetpassword
-const resetControl = catchAsync(async (req, res) => {
-    //a) getting user reset credential :
-    const { email, password } = req.body;
+// //9:) this is 2nd redirected hit for forgetpassword
+// const resetControl = catchAsync(async (req, res) => {
+//     //a) getting user reset credential :
+//     const { email, password } = req.body;
 
-    //c) hash the password and update
-    const hash = await bcrypt.hash(password, 10);
-    await prisma.user.update({
-        where: { email: email },
-        data: { password: hash },
-    });
-    //d) change token value to empty string
-    await prisma.user.update({ where: { email: email }, data: { token: "" } });
+//     //c) hash the password and update
+//     const hash = await bcrypt.hash(password, 10);
+//     await prisma.user.update({
+//         where: { email: email },
+//         data: { password: hash },
+//     });
+//     //d) change token value to empty string
+//     await prisma.user.update({ where: { email: email }, data: { token: "" } });
 
-    //e) if reset is successful then send success message
-    res.status(200).json({
-        status: "success",
-        message: "password reset successful",
-    });
-});
+//     //e) if reset is successful then send success message
+//     res.status(200).json({
+//         status: "success",
+//         message: "password reset successful",
+//     });
+// });
 
 //10:) logout user by putting jwt ==null in user's browser cookie
 const logoutControl = catchAsync(async (req, res, next) => {
@@ -245,7 +251,7 @@ module.exports = {
     loginControl,
     signToken,
     forgetControl,
-    resetControl,
+    // resetControl,
     logoutControl,
     protectTeacher,
     generalProtect,

@@ -62,11 +62,6 @@ enum Role {
   teacher
 }
 
-model Token {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime @default(now())
-}
-
 model Review {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   rating   Int
