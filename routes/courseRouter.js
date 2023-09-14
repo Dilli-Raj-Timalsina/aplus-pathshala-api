@@ -54,7 +54,7 @@ router.route("/getPopularCourse").get(getPopularCourse);
 router.route("/getPurchasedCourse").get(generalProtect, getPurchasedCourse);
 
 // Routes for deleting courses
-router.route("/deleteFolder").post(deleteEntireFolder);
+router.route("/deleteChapter").post(deleteEntireFolder);
 router.route("/deleteCourseAWS").get(deleteAllBucketAtOnce);
 
 module.exports = router;

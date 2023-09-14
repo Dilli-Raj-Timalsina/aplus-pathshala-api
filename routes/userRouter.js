@@ -14,6 +14,5 @@ router.route("/signup").post(signupControl);
 router.route("/login").post(loginControl);
 router.route("/forgetPassword").post(forgetControl);
 router.route("/verifyToken").post(verifyControl);
-// router.route("/resetPassword").post(resetControl);
 
 module.exports = router;
