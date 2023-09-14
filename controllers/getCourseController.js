@@ -36,6 +36,7 @@ const getFile = catchAsync(async (req, res, next) => {
 //2:) get all the information about course
 const getCourseMetaData = catchAsync(async (req, res, next) => {
     const courseId = req.params.id;
+
     const course = await prisma.course.findFirst({
         where: {
             id: courseId,
@@ -63,7 +64,6 @@ const getAllCourses = catchAsync(async (req, res, next) => {
         where: {
             category: req.params.id,
             reviewScore: { gte: req.query.rating * 1 },
-            isFree: req.query.isFree == "true",
             duration: {
                 gte: req.query.duration * 1,
                 lte:
@@ -78,7 +78,6 @@ const getAllCourses = catchAsync(async (req, res, next) => {
         where: {
             category: req.params.id,
             reviewScore: { gte: req.query.rating * 1 },
-            isFree: req.query.isFree == "true",
             duration: {
                 gte: req.query.duration * 1,
                 lte:
@@ -112,11 +111,7 @@ const getAllChapters = catchAsync(async (req, res, next) => {
 
 //5:) get all popular  courses
 const getPopularCourse = catchAsync(async (req, res, next) => {
-    const course = await prisma.course.findMany({
-        where: {
-            reviewScore: { gte: 4 },
-        },
-    });
+    const course = await prisma.course.findMany({});
     res.status(200).json({
         status: "success",
         course,
@@ -126,6 +121,7 @@ const getPopularCourse = catchAsync(async (req, res, next) => {
 //6:) get all purchased course
 const getPurchasedCourse = catchAsync(async (req, res, next) => {
     const userId = req.user.Id;
+    throw new AppError("No Purchase", 404);
     const doc = await prisma.course.findMany({
         where: {
             id: userId,
