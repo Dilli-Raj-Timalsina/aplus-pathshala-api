@@ -111,10 +111,7 @@ const getAllChapters = catchAsync(async (req, res, next) => {
 
 //5:) get all popular  courses
 const getPopularCourse = catchAsync(async (req, res, next) => {
-    console.log("hi bro");
     const course = await prisma.course.findMany({});
-    console.log(course);
-    console.log("hi bro");
     res.status(200).json({
         status: "success",
         course,
