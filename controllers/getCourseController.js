@@ -44,7 +44,7 @@ const getCourseMetaData = catchAsync(async (req, res, next) => {
     });
     if (!course) {
         throw new AppError(
-            "cannot find such course ,please try correct courseID",
+            "cannot find such course , please try correct courseID",
             404
         );
     }
@@ -111,8 +111,10 @@ const getAllChapters = catchAsync(async (req, res, next) => {
 
 //5:) get all popular  courses
 const getPopularCourse = catchAsync(async (req, res, next) => {
+    console.log("hi bro");
     const course = await prisma.course.findMany({});
     console.log(course);
+    console.log("hi bro");
     res.status(200).json({
         status: "success",
         course,
