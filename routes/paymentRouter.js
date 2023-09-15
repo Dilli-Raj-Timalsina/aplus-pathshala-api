@@ -81,8 +81,9 @@ router
             line_items: lineItems,
             mode: "payment",
             customer: customer.id,
-            success_url: "http://localhost:3000/checkout-cart/success",
-            cancel_url: "http://localhost:3000/checkout-cart/failed",
+            success_url:
+                "https://nextjssite-mu.vercel.app/checkout-cart/success",
+            cancel_url: "https://nextjssite-mu.vercel.app/checkout-cart/failed",
         });
 
         res.json({ id: session.id });
