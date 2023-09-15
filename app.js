@@ -7,7 +7,7 @@ const prisma = require("./prisma/prismaClientExport");
 // app.use(cors());
 const allowedOrigins = [
     "http://localhost:3000",
-    "https://nextjssite-mu.vercel.app/",
+    "https://nextjssite-mu.vercel.app",
 ];
 app.use(
     cors({
@@ -15,12 +15,6 @@ app.use(
         credentials: true,
     })
 );
-
-// Access-Control-Allow-Origin *
-// a+pathshala.com, front-end natours.com
-// app.use(cors({
-//   origin: 'https://www.a+pathshala.com'
-// }))
 
 //global error handler config:
 const AppError = require("./errors/appError");
